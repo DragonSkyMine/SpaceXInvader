@@ -11,6 +11,7 @@
   <script type="text/javascript" src="heightfield.js"></script>
   <script type="text/javascript" src="background.js"></script>
   <script type="text/javascript" src="spaceship.js"></script>
+  <script type="text/javascript" src="ennemi.js"></script>
 
   <script id="heightfield-vs" type="x-shader/x-vertex">
   // *** le vertex shader ***
@@ -46,7 +47,7 @@ float hash(vec2 p) {
 }
 
 float vnoise(in vec2 p) {
-    // genere une valeur random sur une position spécifique d'une grille
+    // genere une valeur random sur une position spï¿½cifique d'une grille
     // pris sur shadertoy
     vec2 i = floor(p);
     vec2 f = fract(p);
@@ -186,12 +187,41 @@ void main(void) {
 }
 </script>
 
+<script id="ennemi-vs" type="x-shader/x-vertex">
+// *** le vertex shader ***
+attribute vec3 aVertexPosition; // la position du sommet
+attribute vec2 aVertexCoord; // sa coordonnee de texture
+
+uniform vec2 uPosition; // position du vaisseau
+varying vec2 vTextureCoord; // on souhaite rasteriser la coordonnee
+
+void main(void) {
+  // projection de la position
+  gl_Position = vec4(aVertexPosition+vec3(uPosition,0.0), 1.0);
+
+  // stockage de la coordonnee de texture
+  vTextureCoord = aVertexCoord;
+}
+</script>
+<script id="ennemi-fs" type="x-shader/x-fragment">
+// *** le fragment shader ***
+precision highp float; // precision des nombres flottant
+
+varying vec2 vTextureCoord; // recuperation de la coord rasterisee
+
+uniform sampler2D uTexture; // la texture en entree
+
+void main(void) {
+    gl_FragColor = texture2D(uTexture, vTextureCoord);
+}
+</script>
+
 <script type="text/javascript">
 
-    var fbo; // le FBO utilisé pour rendre la texture de hauteur
-    var heightfield; // l'objet heightfield, sa géométrie, son shader
-    var background; // l'objet background, sa géométrie, son shader
-    var spaceship; // l'objet spaceship, sa géométrie, son shader
+    var fbo; // le FBO utilisï¿½ pour rendre la texture de hauteur
+    var heightfield; // l'objet heightfield, sa gï¿½omï¿½trie, son shader
+    var background; // l'objet background, sa gï¿½omï¿½trie, son shader
+    var spaceship; // l'objet spaceship, sa gï¿½omï¿½trie, son shader
 
     function drawScene() {
         // initialisation du viewport
@@ -200,7 +230,7 @@ void main(void) {
         // efface les buffers de couleur et de profondeur
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        // active le FBO (a partie de la, on dessine dans la texture associée)
+        // active le FBO (a partie de la, on dessine dans la texture associï¿½e)
         gl.bindFramebuffer(gl.FRAMEBUFFER,fbo.id());
 
         // dessin du heightfield
@@ -211,7 +241,7 @@ void main(void) {
         // desactivation du FBO (on dessine sur l'ecran maintenant)
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-        // dessin du background (utilise la texture dessinée précédemment)
+        // dessin du background (utilise la texture dessinï¿½e prï¿½cï¿½demment)
         gl.useProgram(background.shader());
         background.sendUniformVariables();
         background.draw();
@@ -222,8 +252,8 @@ void main(void) {
         spaceship.draw();
     }
 
-    // une bonne manière de gerer les evenements claviers
-    // permet d'avoir plusieurs touches appuyées simultanémen
+    // une bonne maniï¿½re de gerer les evenements claviers
+    // permet d'avoir plusieurs touches appuyï¿½es simultanï¿½men
     var currentlyPressedKeys = {};
 
     function handleKeyDown(event) {
@@ -244,7 +274,7 @@ void main(void) {
 
     function mouseMove(event) {
         // controle de la position du vaisseau en fonction de la souris
-        // la position est remappée entre -1 et 1 pour cela
+        // la position est remappï¿½e entre -1 et 1 pour cela
         var newx = 2.0*(event.clientX/gl.viewportWidth)-1.0;
         var newy = -(2.0*(event.clientY/gl.viewportHeight)-1.0);
         spaceship.setPosition(newx,newy);
