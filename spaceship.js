@@ -17,7 +17,39 @@ function initSpaceshipShader() {
      // adresse de la variable uniforme uOffset dans le shader
     spaceshipShader.positionUniform = gl.getUniformLocation(spaceshipShader, "uPosition");
 
+    // adresse de la variable uniforme uTexture dans le shader
+    spaceshipShader.textureUniform = gl.getUniformLocation(spaceshipShader, "uTexture");
+
     console.log("spaceship shader initialized");
+}
+
+var spaceshipTexture;
+
+function initSpaceshipTexture() {
+    // creation de la texture
+    spaceshipTexture = gl.createTexture();
+    spaceshipTexture.image = new Image();
+    spaceshipTexture.image.onload = function () {
+        // active la texture (les operations qui suivent feront effet sur celle-ci)
+        gl.bindTexture(gl.TEXTURE_2D, spaceshipTexture);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+
+        // envoie les donnees sur GPU
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, spaceshipTexture.image);
+
+        // options (filtrage+effets de bordure)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+        gl.generateMipmap(gl.TEXTURE_2D, gl.LINEAR_MIPMAP_LINEAR);
+
+        // desactive la texture courante
+        gl.bindTexture(gl.TEXTURE_2D, null);
+    }
+
+    spaceshipTexture.image.src = "spaceship.png";
 }
 
 function Spaceship() {
@@ -43,13 +75,13 @@ function Spaceship() {
 	this.vertexBuffer.itemSize = 3;
 	this.vertexBuffer.numItems = 4;
 		
-	// meme principe pour les couleurs
+	// position de texture
 	this.coordBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.coordBuffer);
 	var coords = [
 		 0.0, 0.0, 
-		 1.0, 0.0, 
-		 1.0, 1.0, 
+		 1.0, 0.0,
+		 1.0, 1.0,
 		 0.0, 1.0
 	];
 
@@ -98,7 +130,13 @@ Spaceship.prototype.draw = function() {
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.coordBuffer);
 	gl.vertexAttribPointer(spaceshipShader.vertexCoordAttribute, this.coordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-	// dessine les buffers actifs
+    // envoie la texture au shader
+    gl.activeTexture(gl.TEXTURE0); // on active l'unite de texture 0
+    gl.bindTexture(gl.TEXTURE_2D, spaceshipTexture); // on place maTexture dans l'unité active
+    gl.uniform1i(spaceshipShader.textureUniform, 0); // on dit au shader que maTextureUniform se trouve sur l'unite de texture 0
+
+
+    // dessine les buffers actifs
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.triangles);
 	gl.drawElements(gl.TRIANGLES, this.triangles.numItems, gl.UNSIGNED_SHORT, 0);
 }

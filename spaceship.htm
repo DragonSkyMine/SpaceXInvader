@@ -46,10 +46,10 @@ float hash(vec2 p) {
 }
 
 float vnoise(in vec2 p) {
-  // genere une valeur random sur une position spÃ©cifique d'une grille
-  // pris sur shadertoy
-  vec2 i = floor(p);
-  vec2 f = fract(p);
+    // genere une valeur random sur une position spécifique d'une grille
+    // pris sur shadertoy
+    vec2 i = floor(p);
+    vec2 f = fract(p);
 
   vec2 u = f*f*(3.0-2.0*f);
 
@@ -179,141 +179,146 @@ precision highp float; // precision des nombres flottant
 
 varying vec2 vTextureCoord; // recuperation de la coord rasterisee
 
-void main(void) {
-  // couleur par defaut du vaisseau... a changer
-  gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+uniform sampler2D uTexture; // la texture en entree
 
+void main(void) {
+    gl_FragColor = texture2D(uTexture, vTextureCoord);
 }
 </script>
 
 <script type="text/javascript">
 
-var fbo; // le FBO utilisÃ© pour rendre la texture de hauteur
-var heightfield; // l'objet heightfield, sa gÃ©omÃ©trie, son shader
-var background; // l'objet background, sa gÃ©omÃ©trie, son shader
-var spaceship; // l'objet spaceship, sa gÃ©omÃ©trie, son shader
+    var fbo; // le FBO utilisé pour rendre la texture de hauteur
+    var heightfield; // l'objet heightfield, sa géométrie, son shader
+    var background; // l'objet background, sa géométrie, son shader
+    var spaceship; // l'objet spaceship, sa géométrie, son shader
 
-function drawScene() {
-  // initialisation du viewport
-  gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+    function drawScene() {
+        // initialisation du viewport
+        gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 
-  // efface les buffers de couleur et de profondeur
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        // efface les buffers de couleur et de profondeur
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  // active le FBO (a partie de la, on dessine dans la texture associÃ©e)
-  gl.bindFramebuffer(gl.FRAMEBUFFER,fbo.id());
+        // active le FBO (a partie de la, on dessine dans la texture associée)
+        gl.bindFramebuffer(gl.FRAMEBUFFER,fbo.id());
 
-  // dessin du heightfield
-  gl.useProgram(heightfield.shader());
-  heightfield.sendUniformVariables();
-  heightfield.draw();
+        // dessin du heightfield
+        gl.useProgram(heightfield.shader());
+        heightfield.sendUniformVariables();
+        heightfield.draw();
 
-  // desactivation du FBO (on dessine sur l'ecran maintenant)
-  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        // desactivation du FBO (on dessine sur l'ecran maintenant)
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-  // dessin du background (utilise la texture dessinÃ©e prÃ©cÃ©demment)
-  gl.useProgram(background.shader());
-  background.sendUniformVariables();
-  background.draw();
+        // dessin du background (utilise la texture dessinée précédemment)
+        gl.useProgram(background.shader());
+        background.sendUniformVariables();
+        background.draw();
 
-  // dessin du vaisseau (shader par defaut ici)
-  gl.useProgram(spaceship.shader());
-  spaceship.sendUniformVariables();
-  spaceship.draw();
-}
+        // dessin du vaisseau (shader par defaut ici)
+        gl.useProgram(spaceship.shader());
+        spaceship.sendUniformVariables();
+        spaceship.draw();
+    }
 
-// une bonne maniÃ¨re de gerer les evenements claviers
-// permet d'avoir plusieurs touches appuyÃ©es simultanÃ©men
-var currentlyPressedKeys = {};
+    // une bonne manière de gerer les evenements claviers
+    // permet d'avoir plusieurs touches appuyées simultanémen
+    var currentlyPressedKeys = {};
 
-function handleKeyDown(event) {
-  currentlyPressedKeys[event.keyCode] = true;
-}
-
-
-function handleKeyUp(event) {
-  currentlyPressedKeys[event.keyCode] = false;
-}
-
-function handleKeys() {
-  if (currentlyPressedKeys[33]) {
-    // Page Up (par exemple)
-    // faire quelque chose...
-  }
-}
-
-function mouseMove(event) {
-  // controle de la position du vaisseau en fonction de la souris
-  // la position est remappÃ©e entre -1 et 1 pour cela
-  var newx = 2.0*(event.clientX/gl.viewportWidth)-1.0;
-  var newy = -(2.0*(event.clientY/gl.viewportHeight)-1.0);
-  spaceship.setPosition(newx,newy);
-}
+    function handleKeyDown(event) {
+        currentlyPressedKeys[event.keyCode] = true;
+    }
 
 
-// animation
-var lastTime = 0;
-function animate() {
-  var timeNow = new Date().getTime();
-  if (lastTime != 0) {
-    // chaque objet est susceptible de s'animer
-    var elapsed = timeNow - lastTime;
-    heightfield.setParameters(elapsed);
-    spaceship.setParameters(elapsed);
-    background.setParameters(elapsed);
-  }
-  lastTime = timeNow;
-}
+    function handleKeyUp(event) {
+        currentlyPressedKeys[event.keyCode] = false;
+    }
 
-function tick() {
-  requestAnimFrame(tick);
-  handleKeys();
-  drawScene();
-  animate();
-}
+    function handleKeys() {
+        if (currentlyPressedKeys[33]) {
+            // Page Up (par exemple)
+            // faire quelque chose...
+        }
+    }
+
+    function mouseMove(event) {
+        // controle de la position du vaisseau en fonction de la souris
+        // la position est remappée entre -1 et 1 pour cela
+        var newx = 2.0*(event.clientX/gl.viewportWidth)-1.0;
+        var newy = -(2.0*(event.clientY/gl.viewportHeight)-1.0);
+        spaceship.setPosition(newx,newy);
+    }
 
 
-function webGLStart() {
-  // initialisation du canvas et des objets OpenGL
-  var canvas = document.getElementById("SpaceShip");
-  initGL(canvas);
+    // animation
+    var lastTime = 0;
+    function animate() {
+        var timeNow = new Date().getTime();
+        if (lastTime != 0) {
+            // chaque objet est susceptible de s'animer
+            var elapsed = timeNow - lastTime;
+            heightfield.setParameters(elapsed);
+            spaceship.setParameters(elapsed);
+            background.setParameters(elapsed);
+        }
+        lastTime = timeNow;
+    }
 
-  // init FBO
-  fbo = new FBO(canvas.width,canvas.height,1,false);
+    function tick() {
+        requestAnimFrame(tick);
+        handleKeys();
+        drawScene();
+        animate();
+    }
 
-  // init de tous les shaders
-  initHeightfieldShader();
-  initBackgroundShader();
-  initSpaceshipShader();
 
-  // init de tous les objets
-  heightfield = new Heightfield();
-  background = new Background(fbo.texture(0));
-  spaceship = new Spaceship();
+    function webGLStart() {
+        // initialisation du canvas et des objets OpenGL
+        var canvas = document.getElementById("SpaceShip");
+        initGL(canvas);
 
-  // la couleur de fond sera noire
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        // init FBO
+        fbo = new FBO(canvas.width,canvas.height,1,false);
 
-  // active le teste de profondeur
-  gl.enable(gl.DEPTH_TEST);
+        // init de tous les shaders
+        initHeightfieldShader();
+        initBackgroundShader();
+        initSpaceshipShader();
 
-  /* Mouse and keyboard interaction functions */
-  //canvas.addEventListener('mousedown', tbMouseDown, true);
-  canvas.addEventListener('mousemove', mouseMove, true);
-  //canvas.addEventListener('mouseup', tbMouseUp, true);
+        // init des textures
+        initSpaceshipTexture();
 
-  document.onkeydown = handleKeyDown;
-  document.onkeyup = handleKeyUp;
+        // init de tous les objets
+        heightfield = new Heightfield();
+        background = new Background(fbo.texture(0));
+        spaceship = new Spaceship();
 
-  // dessine la scene
-  tick();
-}
+        // la couleur de fond sera noire
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+
+        // active le teste de profondeur
+        gl.enable(gl.DEPTH_TEST);
+
+        /* Mouse and keyboard interaction functions */
+        //canvas.addEventListener('mousedown', tbMouseDown, true);
+        canvas.addEventListener('mousemove', mouseMove, true);
+        //canvas.addEventListener('mouseup', tbMouseUp, true);
+
+        document.onkeydown = handleKeyDown;
+        document.onkeyup = handleKeyUp;
+
+        // dessine la scene
+        tick();
+    }
 
 
 </script>
 
 
 </head>
+
+
 <body onload="webGLStart();">
   <canvas id="SpaceShip" style="border: none; cursor: none;" width="800" height="800"></canvas>
 </body>
