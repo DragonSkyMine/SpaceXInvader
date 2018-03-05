@@ -1,30 +1,31 @@
 <!DOCTYPE html>
-<html><head>
-<title>SpaceShip</title>
-<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<html>
+<head>
+  <title>SpaceShip</title>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1252">
 
-<script type="text/javascript" src="gl-matrix.js"></script>
-<script type="text/javascript" src="webgl-utils.js"></script>
-<script type="text/javascript" src="game-utils.js"></script>
-<script type="text/javascript" src="fbo.js"></script>
-<script type="text/javascript" src="heightfield.js"></script>
-<script type="text/javascript" src="background.js"></script>
-<script type="text/javascript" src="spaceship.js"></script>
+  <script type="text/javascript" src="gl-matrix.js"></script>
+  <script type="text/javascript" src="webgl-utils.js"></script>
+  <script type="text/javascript" src="game-utils.js"></script>
+  <script type="text/javascript" src="fbo.js"></script>
+  <script type="text/javascript" src="heightfield.js"></script>
+  <script type="text/javascript" src="background.js"></script>
+  <script type="text/javascript" src="spaceship.js"></script>
 
-<script id="heightfield-vs" type="x-shader/x-vertex">
-    // *** le vertex shader ***
-    attribute vec3 aVertexPosition; // la position du sommet
-    attribute vec2 aVertexCoord; // sa coordonnee de texture
+  <script id="heightfield-vs" type="x-shader/x-vertex">
+  // *** le vertex shader ***
+  attribute vec3 aVertexPosition; // la position du sommet
+  attribute vec2 aVertexCoord; // sa coordonnee de texture
 
-    varying vec2 vTextureCoord; // on souhaite rasteriser la coordonnee
+  varying vec2 vTextureCoord; // on souhaite rasteriser la coordonnee
 
-    void main(void) {
-        // projection de la position
-        gl_Position = vec4(aVertexPosition, 1.0);
+  void main(void) {
+    // projection de la position
+    gl_Position = vec4(aVertexPosition, 1.0);
 
-        // stockage de la coordonnee de texture
-        vTextureCoord = aVertexCoord;
-    }
+    // stockage de la coordonnee de texture
+    vTextureCoord = aVertexCoord;
+  }
 </script>
 
 <script id="heightfield-fs" type="x-shader/x-fragment">
@@ -39,63 +40,63 @@ uniform float uPersistence; // persistence du bruit
 varying vec2 vTextureCoord; // recuperation de la coord rasterisee
 
 float hash(vec2 p) {
-    // pseudo random fonction
-    float h = dot(mod(p,vec2(100.0)),vec2(127.1,311.7));
-    return -1.0 + 2.0*fract(sin(h)*43758.5453123);
+  // pseudo random fonction
+  float h = dot(mod(p,vec2(100.0)),vec2(127.1,311.7));
+  return -1.0 + 2.0*fract(sin(h)*43758.5453123);
 }
 
 float vnoise(in vec2 p) {
-    // genere une valeur random sur une position spécifique d'une grille
-    // pris sur shadertoy
-    vec2 i = floor(p);
-    vec2 f = fract(p);
+  // genere une valeur random sur une position spécifique d'une grille
+  // pris sur shadertoy
+  vec2 i = floor(p);
+  vec2 f = fract(p);
 
-    vec2 u = f*f*(3.0-2.0*f);
+  vec2 u = f*f*(3.0-2.0*f);
 
-    return mix( mix( hash( i + vec2(0.0,0.0) ),
-                     hash( i + vec2(1.0,0.0) ), u.x),
-                mix( hash( i + vec2(0.0,1.0) ),
-                     hash( i + vec2(1.0,1.0) ), u.x), u.y);
+  return mix( mix( hash( i + vec2(0.0,0.0) ),
+  hash( i + vec2(1.0,0.0) ), u.x),
+  mix( hash( i + vec2(0.0,1.0) ),
+  hash( i + vec2(1.0,1.0) ), u.x), u.y);
 }
 
 float fractalNoise(in vec2 p) {
-    const int nb = 5; // nb octave
-    float f = uFrequency; // frequency
-    float a = uAmplitude; // amplitude
-    float e = uPersistence; // persistence
+  const int nb = 5; // nb octave
+  float f = uFrequency; // frequency
+  float a = uAmplitude; // amplitude
+  float e = uPersistence; // persistence
 
-    float n = 0.0;
-    for(int i=0;i<nb;++i) {
-        n = n + a*vnoise(p*f);
-        f = 2.0*f;
-        a = a*e;
-    }
-    return n;
+  float n = 0.0;
+  for(int i=0;i<nb;++i) {
+    n = n + a*vnoise(p*f);
+    f = 2.0*f;
+    a = a*e;
+  }
+  return n;
 }
 
 void main(void) {
-    vec2 p = vTextureCoord*2.0-vec2(1.0); // coordonnees
-    float n = fractalNoise(p+uOffset)*0.5+0.5; // bruit
+  vec2 p = vTextureCoord*2.0-vec2(1.0); // coordonnees
+  float n = fractalNoise(p+uOffset)*0.5+0.5; // bruit
 
-    gl_FragColor = vec4(vec3(n),1.0);
+  gl_FragColor = vec4(vec3(n),1.0);
 
 }
 </script>
 
 <script id="background-vs" type="x-shader/x-vertex">
-    // *** le vertex shader ***
-    attribute vec3 aVertexPosition; // la position du sommet
-    attribute vec2 aVertexCoord; // sa coordonnee de texture
+// *** le vertex shader ***
+attribute vec3 aVertexPosition; // la position du sommet
+attribute vec2 aVertexCoord; // sa coordonnee de texture
 
-    varying vec2 vTextureCoord; // on souhaite rasteriser la coordonnee
+varying vec2 vTextureCoord; // on souhaite rasteriser la coordonnee
 
-    void main(void) {
-        // projection de la position
-        gl_Position = vec4(aVertexPosition, 1.0);
+void main(void) {
+  // projection de la position
+  gl_Position = vec4(aVertexPosition, 1.0);
 
-        // stockage de la coordonnee de texture
-        vTextureCoord = aVertexCoord;
-    }
+  // stockage de la coordonnee de texture
+  vTextureCoord = aVertexCoord;
+}
 </script>
 
 <script id="background-fs" type="x-shader/x-fragment">
@@ -107,71 +108,71 @@ uniform vec2 uTextureSize; // la taille de la texture
 varying vec2 vTextureCoord; // recuperation de la coord rasterisee
 
 vec3 shade(in vec3 n,in float d) {
-    vec2 xy = vTextureCoord.xy*2.0-vec2(1.0);
-    vec3 v = -normalize(vec3(xy.x,xy.y,1.0)); // vecteur vue
-    vec3 l = normalize(vec3(-0.3,0.0,1.0)); // vecteur lumière (pourrait varier au cours du temps pour de meilleurs effets)
+  vec2 xy = vTextureCoord.xy*2.0-vec2(1.0);
+  vec3 v = -normalize(vec3(xy.x,xy.y,1.0)); // vecteur vue
+  vec3 l = normalize(vec3(-0.3,0.0,1.0)); // vecteur lumière (pourrait varier au cours du temps pour de meilleurs effets)
 
-    // TODO : le shading !
-    // la fonction prend en entrée la normale du terrain et sa profondeur
-    vec3 r = reflect(l, n);
-    vec3 ka = vec3(0.2, 0.0, 0.1);
-    vec3 kd = vec3(1.0, 1.0, 1.0);
-    vec3 ks = vec3(0.8, 0.8, 0.8);
-    vec3 li = vec3(1.0, 1.0, 1.0);
+  // TODO : le shading !
+  // la fonction prend en entrée la normale du terrain et sa profondeur
+  vec3 r = reflect(l, n);
+  vec3 ka = vec3(0.2, 0.0, 0.1);
+  vec3 kd = vec3(1.0, 1.0, 1.0);
+  vec3 ks = vec3(0.8, 0.8, 0.8);
+  vec3 li = vec3(1.0, 1.0, 1.0);
 
-    vec3 kdnl = kd * max(dot(n, l), 0.0);
-    vec3 ksvr = ks * pow(max(dot(v, r), 0.0), 5.0);
-
-
-    // la couleur est attribuee au fragment courant
-    n = (ka + kdnl + ksvr);
+  vec3 kdnl = kd * max(dot(n, l), 0.0);
+  vec3 ksvr = ks * pow(max(dot(v, r), 0.0), 5.0);
 
 
-    return n;
+  // la couleur est attribuee au fragment courant
+  n = (ka + kdnl + ksvr);
+
+
+  return n;
 }
 
 vec3 computeNormal() {
-    const float scale = 20.0;
+  const float scale = 20.0;
 
-    vec2 ps = 1.0/uTextureSize;
-    float xp = texture2D(uHeightfield,vTextureCoord+vec2( ps.x,0.0)).x;
-    float xm = texture2D(uHeightfield,vTextureCoord+vec2(-ps.x,0.0)).x;
-    float yp = texture2D(uHeightfield,vTextureCoord+vec2(0.0, ps.y)).x;
-    float ym = texture2D(uHeightfield,vTextureCoord+vec2(0.0,-ps.y)).x;
+  vec2 ps = 1.0/uTextureSize;
+  float xp = texture2D(uHeightfield,vTextureCoord+vec2( ps.x,0.0)).x;
+  float xm = texture2D(uHeightfield,vTextureCoord+vec2(-ps.x,0.0)).x;
+  float yp = texture2D(uHeightfield,vTextureCoord+vec2(0.0, ps.y)).x;
+  float ym = texture2D(uHeightfield,vTextureCoord+vec2(0.0,-ps.y)).x;
 
-    float gx = 0.5*(xp-xm)*scale;
-    float gy = 0.5*(yp-ym)*scale;
+  float gx = 0.5*(xp-xm)*scale;
+  float gy = 0.5*(yp-ym)*scale;
 
-    vec3 v1 = normalize(vec3(1.0,0.0,gx));
-    vec3 v2 = normalize(vec3(0.0,1.0,gy));
+  vec3 v1 = normalize(vec3(1.0,0.0,gx));
+  vec3 v2 = normalize(vec3(0.0,1.0,gy));
 
-    return cross(v1,v2);
+  return cross(v1,v2);
 }
 
 void main(void) {
-    float d = texture2D(uHeightfield,vTextureCoord).x;
-    vec3 n = computeNormal();
-    vec3 s = shade(n,d);
-    gl_FragColor = vec4(s,1.0);
+  float d = texture2D(uHeightfield,vTextureCoord).x;
+  vec3 n = computeNormal();
+  vec3 s = shade(n,d);
+  gl_FragColor = vec4(s,1.0);
 
 }
 </script>
 
 <script id="spaceship-vs" type="x-shader/x-vertex">
-    // *** le vertex shader ***
-    attribute vec3 aVertexPosition; // la position du sommet
-    attribute vec2 aVertexCoord; // sa coordonnee de texture
+// *** le vertex shader ***
+attribute vec3 aVertexPosition; // la position du sommet
+attribute vec2 aVertexCoord; // sa coordonnee de texture
 
-    uniform vec2 uPosition; // position du vaisseau
-    varying vec2 vTextureCoord; // on souhaite rasteriser la coordonnee
+uniform vec2 uPosition; // position du vaisseau
+varying vec2 vTextureCoord; // on souhaite rasteriser la coordonnee
 
-    void main(void) {
-        // projection de la position
-        gl_Position = vec4(aVertexPosition+vec3(uPosition,0.0), 1.0);
+void main(void) {
+  // projection de la position
+  gl_Position = vec4(aVertexPosition+vec3(uPosition,0.0), 1.0);
 
-        // stockage de la coordonnee de texture
-        vTextureCoord = aVertexCoord;
-    }
+  // stockage de la coordonnee de texture
+  vTextureCoord = aVertexCoord;
+}
 </script>
 <script id="spaceship-fs" type="x-shader/x-fragment">
 // *** le fragment shader ***
@@ -180,142 +181,141 @@ precision highp float; // precision des nombres flottant
 varying vec2 vTextureCoord; // recuperation de la coord rasterisee
 
 void main(void) {
-    // couleur par defaut du vaisseau... a changer
-    gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+  // couleur par defaut du vaisseau... a changer
+  gl_FragColor = vec4(1.0,0.0,0.0,1.0);
 
 }
 </script>
 
 <script type="text/javascript">
 
-    var fbo; // le FBO utilisé pour rendre la texture de hauteur
-    var heightfield; // l'objet heightfield, sa géométrie, son shader
-    var background; // l'objet background, sa géométrie, son shader
-    var spaceship; // l'objet spaceship, sa géométrie, son shader
+var fbo; // le FBO utilisé pour rendre la texture de hauteur
+var heightfield; // l'objet heightfield, sa géométrie, son shader
+var background; // l'objet background, sa géométrie, son shader
+var spaceship; // l'objet spaceship, sa géométrie, son shader
 
-    function drawScene() {
-        // initialisation du viewport
-        gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+function drawScene() {
+  // initialisation du viewport
+  gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 
-        // efface les buffers de couleur et de profondeur
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  // efface les buffers de couleur et de profondeur
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        // active le FBO (a partie de la, on dessine dans la texture associée)
-        gl.bindFramebuffer(gl.FRAMEBUFFER,fbo.id());
+  // active le FBO (a partie de la, on dessine dans la texture associée)
+  gl.bindFramebuffer(gl.FRAMEBUFFER,fbo.id());
 
-        // dessin du heightfield
-        gl.useProgram(heightfield.shader());
-        heightfield.sendUniformVariables();
-        heightfield.draw();
+  // dessin du heightfield
+  gl.useProgram(heightfield.shader());
+  heightfield.sendUniformVariables();
+  heightfield.draw();
 
-        // desactivation du FBO (on dessine sur l'ecran maintenant)
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  // desactivation du FBO (on dessine sur l'ecran maintenant)
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-        // dessin du background (utilise la texture dessinée précédemment)
-        gl.useProgram(background.shader());
-        background.sendUniformVariables();
-        background.draw();
+  // dessin du background (utilise la texture dessinée précédemment)
+  gl.useProgram(background.shader());
+  background.sendUniformVariables();
+  background.draw();
 
-        // dessin du vaisseau (shader par defaut ici)
-        gl.useProgram(spaceship.shader());
-        spaceship.sendUniformVariables();
-        spaceship.draw();
-    }
+  // dessin du vaisseau (shader par defaut ici)
+  gl.useProgram(spaceship.shader());
+  spaceship.sendUniformVariables();
+  spaceship.draw();
+}
 
-    // une bonne manière de gerer les evenements claviers
-    // permet d'avoir plusieurs touches appuyées simultanémen
-    var currentlyPressedKeys = {};
+// une bonne manière de gerer les evenements claviers
+// permet d'avoir plusieurs touches appuyées simultanémen
+var currentlyPressedKeys = {};
 
-    function handleKeyDown(event) {
-        currentlyPressedKeys[event.keyCode] = true;
-    }
-
-
-    function handleKeyUp(event) {
-        currentlyPressedKeys[event.keyCode] = false;
-    }
-
-    function handleKeys() {
-        if (currentlyPressedKeys[33]) {
-            // Page Up (par exemple)
-            // faire quelque chose...
-        }
-    }
-
-    function mouseMove(event) {
-        // controle de la position du vaisseau en fonction de la souris
-        // la position est remappée entre -1 et 1 pour cela
-        var newx = 2.0*(event.clientX/gl.viewportWidth)-1.0;
-        var newy = -(2.0*(event.clientY/gl.viewportHeight)-1.0);
-        spaceship.setPosition(newx,newy);
-    }
+function handleKeyDown(event) {
+  currentlyPressedKeys[event.keyCode] = true;
+}
 
 
-    // animation
-    var lastTime = 0;
-    function animate() {
-        var timeNow = new Date().getTime();
-        if (lastTime != 0) {
-            // chaque objet est susceptible de s'animer
-            var elapsed = timeNow - lastTime;
-            heightfield.setParameters(elapsed);
-            spaceship.setParameters(elapsed);
-            background.setParameters(elapsed);
-        }
-        lastTime = timeNow;
-    }
+function handleKeyUp(event) {
+  currentlyPressedKeys[event.keyCode] = false;
+}
 
-    function tick() {
-        requestAnimFrame(tick);
-        handleKeys();
-        drawScene();
-        animate();
-    }
+function handleKeys() {
+  if (currentlyPressedKeys[33]) {
+    // Page Up (par exemple)
+    // faire quelque chose...
+  }
+}
+
+function mouseMove(event) {
+  // controle de la position du vaisseau en fonction de la souris
+  // la position est remappée entre -1 et 1 pour cela
+  var newx = 2.0*(event.clientX/gl.viewportWidth)-1.0;
+  var newy = -(2.0*(event.clientY/gl.viewportHeight)-1.0);
+  spaceship.setPosition(newx,newy);
+}
 
 
-    function webGLStart() {
-        // initialisation du canvas et des objets OpenGL
-        var canvas = document.getElementById("SpaceShip");
-        initGL(canvas);
+// animation
+var lastTime = 0;
+function animate() {
+  var timeNow = new Date().getTime();
+  if (lastTime != 0) {
+    // chaque objet est susceptible de s'animer
+    var elapsed = timeNow - lastTime;
+    heightfield.setParameters(elapsed);
+    spaceship.setParameters(elapsed);
+    background.setParameters(elapsed);
+  }
+  lastTime = timeNow;
+}
 
-        // init FBO
-        fbo = new FBO(canvas.width,canvas.height,1,false);
+function tick() {
+  requestAnimFrame(tick);
+  handleKeys();
+  drawScene();
+  animate();
+}
 
-        // init de tous les shaders
-        initHeightfieldShader();
-        initBackgroundShader();
-        initSpaceshipShader();
 
-        // init de tous les objets
-        heightfield = new Heightfield();
-        background = new Background(fbo.texture(0));
-        spaceship = new Spaceship();
+function webGLStart() {
+  // initialisation du canvas et des objets OpenGL
+  var canvas = document.getElementById("SpaceShip");
+  initGL(canvas);
 
-        // la couleur de fond sera noire
-        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  // init FBO
+  fbo = new FBO(canvas.width,canvas.height,1,false);
 
-        // active le teste de profondeur
-        gl.enable(gl.DEPTH_TEST);
+  // init de tous les shaders
+  initHeightfieldShader();
+  initBackgroundShader();
+  initSpaceshipShader();
 
-        /* Mouse and keyboard interaction functions */
-        //canvas.addEventListener('mousedown', tbMouseDown, true);
-        canvas.addEventListener('mousemove', mouseMove, true);
-        //canvas.addEventListener('mouseup', tbMouseUp, true);
+  // init de tous les objets
+  heightfield = new Heightfield();
+  background = new Background(fbo.texture(0));
+  spaceship = new Spaceship();
 
-        document.onkeydown = handleKeyDown;
-        document.onkeyup = handleKeyUp;
+  // la couleur de fond sera noire
+  gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
-        // dessine la scene
-        tick();
-    }
+  // active le teste de profondeur
+  gl.enable(gl.DEPTH_TEST);
+
+  /* Mouse and keyboard interaction functions */
+  //canvas.addEventListener('mousedown', tbMouseDown, true);
+  canvas.addEventListener('mousemove', mouseMove, true);
+  //canvas.addEventListener('mouseup', tbMouseUp, true);
+
+  document.onkeydown = handleKeyDown;
+  document.onkeyup = handleKeyUp;
+
+  // dessine la scene
+  tick();
+}
 
 
 </script>
 
 
 </head>
-
-
 <body onload="webGLStart();">
-    <canvas id="SpaceShip" style="border: none; cursor: none;" width="800" height="800"></canvas>
-</body></html>
+  <canvas id="SpaceShip" style="border: none; cursor: none;" width="800" height="800"></canvas>
+</body>
+</html>
