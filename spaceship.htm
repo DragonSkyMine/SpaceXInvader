@@ -132,7 +132,7 @@ vec3 shade(in vec3 n,in float d) {
 }
 
 vec3 computeNormal() {
-  const float scale = 20.0;
+  const float scale = 40.0;
 
   vec2 ps = 1.0/uTextureSize;
   float xp = texture2D(uHeightfield,vTextureCoord+vec2( ps.x,0.0)).x;
