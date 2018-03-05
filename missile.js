@@ -1,41 +1,41 @@
-var spaceshipShader;
+var missileShader;
 
-function initSpaceshipShader() {
-	spaceshipShader = initShaders("spaceship-vs","spaceship-fs");
+function initMissileShader() {
+	missileShader = initShaders("missile-vs","missile-fs");
     
     // active ce shader
-    gl.useProgram(spaceshipShader);
+    gl.useProgram(missileShader);
 
     // recupere la localisation de l'attribut dans lequel on souhaite acceder aux positions
-    spaceshipShader.vertexPositionAttribute = gl.getAttribLocation(spaceshipShader, "aVertexPosition");
-    gl.enableVertexAttribArray(spaceshipShader.vertexPositionAttribute); // active cet attribut 
+    missileShader.vertexPositionAttribute = gl.getAttribLocation(missileShader, "aVertexPosition");
+    gl.enableVertexAttribArray(missileShader.vertexPositionAttribute); // active cet attribut
 
     // pareil pour les coordonnees de texture 
-    spaceshipShader.vertexCoordAttribute = gl.getAttribLocation(spaceshipShader, "aVertexCoord");
-    gl.enableVertexAttribArray(spaceshipShader.vertexCoordAttribute);
+    missileShader.vertexCoordAttribute = gl.getAttribLocation(missileShader, "aVertexCoord");
+    gl.enableVertexAttribArray(missileShader.vertexCoordAttribute);
 
      // adresse de la variable uniforme uOffset dans le shader
-    spaceshipShader.positionUniform = gl.getUniformLocation(spaceshipShader, "uPosition");
+    missileShader.positionUniform = gl.getUniformLocation(missileShader, "uPosition");
 
     // adresse de la variable uniforme uTexture dans le shader
-    spaceshipShader.textureUniform = gl.getUniformLocation(spaceshipShader, "uTexture");
+    missileShader.textureUniform = gl.getUniformLocation(missileShader, "uTexture");
 
-    console.log("spaceship shader initialized");
+    console.log("missile shader initialized");
 }
 
-var spaceshipTexture;
+var missileTexture;
 
-function initSpaceshipTexture() {
+function initMissileTexture() {
     // creation de la texture
-    spaceshipTexture = gl.createTexture();
-    spaceshipTexture.image = new Image();
-    spaceshipTexture.image.onload = function () {
+    missileTexture = gl.createTexture();
+    missileTexture.image = new Image();
+    missileTexture.image.onload = function () {
         // active la texture (les operations qui suivent feront effet sur celle-ci)
-        gl.bindTexture(gl.TEXTURE_2D, spaceshipTexture);
+        gl.bindTexture(gl.TEXTURE_2D, missileTexture);
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
         // envoie les donnees sur GPU
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, spaceshipTexture.image);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, missileTexture.image);
 
         // options (filtrage+effets de bordure)
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -49,11 +49,11 @@ function initSpaceshipTexture() {
         gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
-    spaceshipTexture.image.src = "spaceship.png";
+    missileTexture.image.src = "missile.png";
 }
 
-function Spaceship() {
-	this.initParameters();
+function Missile(x, y, speedX, speedY) {
+	this.initParameters(x, y, speedX, speedY);
 
 	// cree un nouveau buffer sur le GPU et l'active
 	this.vertexBuffer = gl.createBuffer();
@@ -96,69 +96,43 @@ function Spaceship() {
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(tri), gl.STATIC_DRAW);
     this.triangles.numItems = 6;
     
-    console.log("spaceship initialized");
+    console.log("missile initialized");
 }
 
-Spaceship.prototype.initParameters = function() {
-	this.width = 0.2;
-	this.height = 0.2;
-	this.position = [0.0,-0.7];
-
-	// temps de rechagement (ms)
-    this.reloadTime = 200;
-
-    // vitesse du missile en y
-    this.missileSpeed = 1;
-
-    this.missiles = []; // Les tirs du joueur
-    this.fire = false;
-    this.timeBeforeNextFire = 0;
+Missile.prototype.initParameters = function(x, y, speedX, speedY) {
+	this.width = 0.05;
+	this.height = 0.1;
+	this.position = [x, y];
+	this.speed = [speedX, speedY];
 }
 
-Spaceship.prototype.beginFire = function() {
-    this.fire = true;
-}
-
-Spaceship.prototype.stopFire = function() {
-    this.fire = false;
-}
-
-Spaceship.prototype.setParameters = function(elapsed) {
+Missile.prototype.setParameters = function(elapsed) {
 	// on pourrait animer des choses ici
-
-    // test des tirs
-    this.timeBeforeNextFire -= elapsed;
-    if (this.fire && this.timeBeforeNextFire <= 0) {
-        this.missiles.push(new Missile(this.position[0], this.position[1], 0, this.missileSpeed));
-        this.timeBeforeNextFire = this.reloadTime;
-    }
+    this.position[0] += this.speed[0] * elapsed/1000;
+    this.position[1] += this.speed[1] * elapsed/1000;
 }
 
-Spaceship.prototype.setPosition = function(x,y) {
-	this.position = [x,y];
+Missile.prototype.shader = function() {
+	return missileShader;
 }
 
-Spaceship.prototype.shader = function() {
-	return spaceshipShader;
+Missile.prototype.sendUniformVariables = function() {
+	gl.uniform2fv(missileShader.positionUniform,this.position);
 }
 
-Spaceship.prototype.sendUniformVariables = function() {
-	gl.uniform2fv(spaceshipShader.positionUniform,this.position);
-}
-
-Spaceship.prototype.draw = function() {
+Missile.prototype.draw = function() {
 	// active le buffer de position et fait le lien avec l'attribut aVertexPosition dans le shader
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-	gl.vertexAttribPointer(spaceshipShader.vertexPositionAttribute, this.vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
+	gl.vertexAttribPointer(missileShader.vertexPositionAttribute, this.vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
 	// active le buffer de coords
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.coordBuffer);
-	gl.vertexAttribPointer(spaceshipShader.vertexCoordAttribute, this.coordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+	gl.vertexAttribPointer(missileShader.vertexCoordAttribute, this.coordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
     // envoie la texture au shader
     gl.activeTexture(gl.TEXTURE0); // on active l'unite de texture 0
-    gl.bindTexture(gl.TEXTURE_2D, spaceshipTexture); // on place maTexture dans l'unité active
-    gl.uniform1i(spaceshipShader.textureUniform, 0); // on dit au shader que maTextureUniform se trouve sur l'unite de texture 0
+    gl.bindTexture(gl.TEXTURE_2D, missileTexture); // on place maTexture dans l'unité active
+    gl.uniform1i(missileShader.textureUniform, 0); // on dit au shader que maTextureUniform se trouve sur l'unite de texture 0
 
 
     // dessine les buffers actifs

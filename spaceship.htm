@@ -11,6 +11,7 @@
   <script type="text/javascript" src="heightfield.js"></script>
   <script type="text/javascript" src="background.js"></script>
   <script type="text/javascript" src="spaceship.js"></script>
+  <script type="text/javascript" src="missile.js"></script>
 
   <script id="heightfield-vs" type="x-shader/x-vertex">
   // *** le vertex shader ***
@@ -186,6 +187,35 @@ void main(void) {
 }
 </script>
 
+<script id="missile-vs" type="x-shader/x-vertex">
+// *** le vertex shader ***
+attribute vec3 aVertexPosition; // la position du sommet
+attribute vec2 aVertexCoord; // sa coordonnee de texture
+
+uniform vec2 uPosition; // position du vaisseau
+varying vec2 vTextureCoord; // on souhaite rasteriser la coordonnee
+
+void main(void) {
+  // projection de la position
+  gl_Position = vec4(aVertexPosition+vec3(uPosition,0.0), 1.0);
+
+  // stockage de la coordonnee de texture
+  vTextureCoord = aVertexCoord;
+}
+</script>
+    <script id="missile-fs" type="x-shader/x-fragment">
+// *** le fragment shader ***
+precision highp float; // precision des nombres flottant
+
+varying vec2 vTextureCoord; // recuperation de la coord rasterisee
+
+uniform sampler2D uTexture; // la texture en entree
+
+void main(void) {
+    gl_FragColor = texture2D(uTexture, vTextureCoord);
+}
+</script>
+
 <script type="text/javascript">
 
     var fbo; // le FBO utilisé pour rendre la texture de hauteur
@@ -220,6 +250,13 @@ void main(void) {
         gl.useProgram(spaceship.shader());
         spaceship.sendUniformVariables();
         spaceship.draw();
+
+        // dessin des missiles
+        for (var i = 0, length = spaceship.missiles.length ; i < length ; i++) {
+            gl.useProgram(spaceship.missiles[i].shader());
+            spaceship.missiles[i].sendUniformVariables();
+            spaceship.missiles[i].draw();
+        }
     }
 
     // une bonne manière de gerer les evenements claviers
@@ -247,7 +284,15 @@ void main(void) {
         // la position est remappée entre -1 et 1 pour cela
         var newx = 2.0*(event.clientX/gl.viewportWidth)-1.0;
         var newy = -(2.0*(event.clientY/gl.viewportHeight)-1.0);
-        spaceship.setPosition(newx,newy);
+        spaceship.setPosition(newx, newy);
+    }
+
+    function tbMouseDown(event) {
+        spaceship.beginFire();
+    }
+
+    function tbMouseUp(event) {
+        spaceship.stopFire();
     }
 
 
@@ -261,6 +306,10 @@ void main(void) {
             heightfield.setParameters(elapsed);
             spaceship.setParameters(elapsed);
             background.setParameters(elapsed);
+
+            for (var i = 0, length = spaceship.missiles.length ; i < length ; i++) {
+                spaceship.missiles[i].setParameters(elapsed);
+            }
         }
         lastTime = timeNow;
     }
@@ -285,9 +334,11 @@ void main(void) {
         initHeightfieldShader();
         initBackgroundShader();
         initSpaceshipShader();
+        initMissileShader();
 
         // init des textures
         initSpaceshipTexture();
+        initMissileTexture();
 
         // init de tous les objets
         heightfield = new Heightfield();
@@ -301,9 +352,9 @@ void main(void) {
         gl.enable(gl.DEPTH_TEST);
 
         /* Mouse and keyboard interaction functions */
-        //canvas.addEventListener('mousedown', tbMouseDown, true);
+        canvas.addEventListener('mousedown', tbMouseDown, true);
         canvas.addEventListener('mousemove', mouseMove, true);
-        //canvas.addEventListener('mouseup', tbMouseUp, true);
+        canvas.addEventListener('mouseup', tbMouseUp, true);
 
         document.onkeydown = handleKeyDown;
         document.onkeyup = handleKeyUp;
