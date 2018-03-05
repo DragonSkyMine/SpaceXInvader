@@ -2,15 +2,15 @@ var heightfieldShader;
 
 function initHeightfieldShader() {
 	heightfieldShader = initShaders("heightfield-vs","heightfield-fs");
-    
+
     // active ce shader
     gl.useProgram(heightfieldShader);
 
     // recupere la localisation de l'attribut dans lequel on souhaite acceder aux positions
     heightfieldShader.vertexPositionAttribute = gl.getAttribLocation(heightfieldShader, "aVertexPosition");
-    gl.enableVertexAttribArray(heightfieldShader.vertexPositionAttribute); // active cet attribut 
+    gl.enableVertexAttribArray(heightfieldShader.vertexPositionAttribute); // active cet attribut
 
-    // pareil pour les coordonnees de texture 
+    // pareil pour les coordonnees de texture
     heightfieldShader.vertexCoordAttribute = gl.getAttribLocation(heightfieldShader, "aVertexCoord");
     gl.enableVertexAttribArray(heightfieldShader.vertexCoordAttribute);
 
@@ -42,21 +42,21 @@ function Heightfield() {
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 	this.vertexBuffer.itemSize = 3;
 	this.vertexBuffer.numItems = 4;
-		
+
 	// meme principe pour les couleurs
 	this.coordBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.coordBuffer);
 	var coords = [
-		 0.0, 0.0, 
-		 1.0, 0.0, 
-		 1.0, 1.0, 
+		 0.0, 0.0,
+		 1.0, 0.0,
+		 1.0, 1.0,
 		 0.0, 1.0
 	];
 
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(coords), gl.STATIC_DRAW);
 	this.coordBuffer.itemSize = 2;
 	this.coordBuffer.numItems = 4;
-	
+
 	// creation des faces du cube (les triangles) avec les indices vers les sommets
 	this.triangles = gl.createBuffer();
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.triangles);
@@ -75,13 +75,13 @@ Heightfield.prototype.initParameters = function() {
 }
 
 Heightfield.prototype.setParameters = function(elapsed) {
-	// un exemple d'animation, a vous de changer ca en fonction 
+	// un exemple d'animation, a vous de changer ca en fonction
 	// de ce que vous souhaitez obtenir
 	this.timer = this.timer+elapsed*0.0004;
-	var speed = 2.0*(Math.sin(this.timer*0.1)*0.5+0.5);
+	var speed = Math.min(4.0, 1.0 + (this.timer * 0.1));
 	this.offset[1] = this.offset[1]+elapsed*0.0004*speed;
-	this.amplitude = 0.2+3.0*(Math.sin(this.timer*0.1)*0.5+0.5);
-	this.frequency = 5.0-speed;
+	this.amplitude = 1.5;
+	this.frequency = 4.0;
 }
 
 Heightfield.prototype.shader = function() {
@@ -108,5 +108,3 @@ Heightfield.prototype.draw = function() {
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.triangles);
 	gl.drawElements(gl.TRIANGLES, this.triangles.numItems, gl.UNSIGNED_SHORT, 0);
 }
-
-
