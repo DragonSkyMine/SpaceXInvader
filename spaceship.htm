@@ -281,7 +281,7 @@ void main(void) {
         spaceship.sendUniformVariables();
         spaceship.draw();
 
-        // dessin des missiles
+        // dessin des missiles du joueur
         for (var i = 0, length = spaceship.missiles.length ; i < length ; i++) {
             gl.useProgram(spaceship.missiles[i].shader());
             spaceship.missiles[i].sendUniformVariables();
@@ -344,9 +344,21 @@ void main(void) {
         lastTime = timeNow;
     }
 
+    // Supprime les éléments hors écran
+    function outOfMap() {
+        // Pour les missiles du joueur
+        for (var i = 0 ; i < spaceship.missiles.length ; i++) {
+            if (spaceship.missiles[i].position[1] > 1 + spaceship.missiles[i].height/2){
+                spaceship.removeMissile(i);
+                i--;
+            }
+        }
+    }
+
     function tick() {
         requestAnimFrame(tick);
         handleKeys();
+        outOfMap();
         drawScene();
         animate();
     }

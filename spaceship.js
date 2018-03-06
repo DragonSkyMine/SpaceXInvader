@@ -138,6 +138,10 @@ Spaceship.prototype.setPosition = function(x,y) {
 	this.position = [x,y];
 }
 
+Spaceship.prototype.removeMissile = function(missileIndex) {
+	this.missiles.splice(missileIndex, 1);
+}
+
 Spaceship.prototype.shader = function() {
 	return spaceshipShader;
 }
