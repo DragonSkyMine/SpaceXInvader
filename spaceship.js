@@ -135,7 +135,6 @@ Spaceship.prototype.draw = function() {
     gl.bindTexture(gl.TEXTURE_2D, spaceshipTexture); // on place maTexture dans l'unité active
     gl.uniform1i(spaceshipShader.textureUniform, 0); // on dit au shader que maTextureUniform se trouve sur l'unite de texture 0
 
-
     // dessine les buffers actifs
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.triangles);
 	gl.drawElements(gl.TRIANGLES, this.triangles.numItems, gl.UNSIGNED_SHORT, 0);
