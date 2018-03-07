@@ -2,19 +2,20 @@ var backgroundShader;
 
 function initBackgroundShader() {
 	backgroundShader = initShaders("background-vs","background-fs");
-    
+
     // active ce shader
     gl.useProgram(backgroundShader);
 
     // recupere la localisation de l'attribut dans lequel on souhaite acceder aux positions
     backgroundShader.vertexPositionAttribute = gl.getAttribLocation(backgroundShader, "aVertexPosition");
-    gl.enableVertexAttribArray(backgroundShader.vertexPositionAttribute); // active cet attribut 
+    gl.enableVertexAttribArray(backgroundShader.vertexPositionAttribute); // active cet attribut
 
-    // pareil pour les coordonnees de texture 
+    // pareil pour les coordonnees de texture
     backgroundShader.vertexCoordAttribute = gl.getAttribLocation(backgroundShader, "aVertexCoord");
     gl.enableVertexAttribArray(backgroundShader.vertexCoordAttribute);
 
      // adresse de la texture uHeightfield dans le shader
+		backgroundShader.timeUniform = gl.getUniformLocation(backgroundShader, "uTime");
     backgroundShader.heightfieldUniform = gl.getUniformLocation(backgroundShader, "uHeightfield");
     backgroundShader.textureSizeUniform = gl.getUniformLocation(backgroundShader, "uTextureSize");
 
@@ -22,6 +23,7 @@ function initBackgroundShader() {
 }
 
 function Background(heightfieldTexture) {
+	this.initParameters();
 	this.heightfieldTexture = heightfieldTexture;
 
 	// cree un nouveau buffer sur le GPU et l'active
@@ -40,21 +42,21 @@ function Background(heightfieldTexture) {
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 	this.vertexBuffer.itemSize = 3;
 	this.vertexBuffer.numItems = 4;
-		
+
 	// meme principe pour les couleurs
 	this.coordBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.coordBuffer);
 	var coords = [
-		 0.0, 0.0, 
-		 1.0, 0.0, 
-		 1.0, 1.0, 
+		 0.0, 0.0,
+		 1.0, 0.0,
+		 1.0, 1.0,
 		 0.0, 1.0
 	];
 
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(coords), gl.STATIC_DRAW);
 	this.coordBuffer.itemSize = 2;
 	this.coordBuffer.numItems = 4;
-	
+
 	// creation des faces du cube (les triangles) avec les indices vers les sommets
 	this.triangles = gl.createBuffer();
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.triangles);
@@ -69,17 +71,24 @@ Background.prototype.shader = function() {
 	return backgroundShader;
 }
 
+Background.prototype.initParameters = function() {
+	this.timer = 0.0;
+	this.time = 0.0;
+}
+
 Background.prototype.setParameters = function(elapsed) {
 	// we could animate something here
+	this.timer = this.timer+elapsed*0.0004;
+	this.time = this.timer % 24000;
 }
 
 Background.prototype.sendUniformVariables = function() {
 	s = [this.heightfieldTexture.width,this.heightfieldTexture.height];
-    gl.uniform2fv(backgroundShader.textureSizeUniform,s);
-
+  gl.uniform2fv(backgroundShader.textureSizeUniform,s);
 	gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D,this.heightfieldTexture);
-    gl.uniform1i(backgroundShader.heightfieldUniform, 0);
+	gl.uniform1f(backgroundShader.timeUniform,this.time);
+  gl.bindTexture(gl.TEXTURE_2D,this.heightfieldTexture);
+  gl.uniform1i(backgroundShader.heightfieldUniform, 0);
 }
 
 Background.prototype.draw = function() {
@@ -95,5 +104,3 @@ Background.prototype.draw = function() {
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.triangles);
 	gl.drawElements(gl.TRIANGLES, this.triangles.numItems, gl.UNSIGNED_SHORT, 0);
 }
-
-

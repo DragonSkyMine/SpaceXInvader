@@ -69,8 +69,8 @@ function Heightfield() {
 Heightfield.prototype.initParameters = function() {
 	this.timer = 0.0;
 	this.offset = [0.0,0.0];
-	this.amplitude = 2.0;
-	this.frequency = 6.0;
+	this.amplitude = 1.3;
+	this.frequency = 3.5;
 	this.persistence = 0.5;
 }
 
@@ -81,7 +81,7 @@ Heightfield.prototype.setParameters = function(elapsed) {
 	var speed = Math.min(4.0, 1.0 + (this.timer * 0.1));
 	this.offset[1] = this.offset[1]+elapsed*0.0004*speed;
 	this.amplitude = 1.5;
-	this.frequency = 4.0;
+	this.frequency = 3.5;
 }
 
 Heightfield.prototype.shader = function() {
