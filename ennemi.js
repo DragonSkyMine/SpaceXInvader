@@ -64,10 +64,10 @@ function ennemi() {
 	var ho2 = 0.5*this.height;
 
 	var vertices = [
-		-wo2,-ho2, -0.5,
-		 wo2,-ho2, -0.5,
-		 wo2, ho2, -0.5,
-		-wo2, ho2, -0.5
+		-wo2,-ho2, -0.6,
+		 wo2,-ho2, -0.6,
+		 wo2, ho2, -0.6,
+		-wo2, ho2, -0.6
 	];
 
 	// on envoie ces positions au GPU ici (et on se rappelle de leur nombre/taille)
