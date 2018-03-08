@@ -131,12 +131,15 @@ Spaceship.prototype.setParameters = function(elapsed) {
 	// on pourrait animer des choses ici
 	this.timer = this.timer+elapsed*0.0004;
 	this.time = Math.max(0.0, -Math.sin((this.timer + 0.5) * 0.1) *0.25 + 0.25);
-	// test des tirs
-	this.timeBeforeNextFire -= elapsed;
-	if (this.fire && this.timeBeforeNextFire <= 0) {
-		this.missiles.push(new Missile(this.position[0], this.position[1] + this.height/2, 0, this.missileSpeed));
-		this.timeBeforeNextFire = this.reloadTime;
-	}
+}
+
+Spaceship.prototype.fireMissile = function(elapsed) {
+    // test des tirs
+    this.timeBeforeNextFire -= elapsed;
+    if (this.fire && this.timeBeforeNextFire <= 0) {
+        this.missiles.push(new Missile(this.position[0], this.position[1] + this.height/2, 0, this.missileSpeed));
+        this.timeBeforeNextFire = this.reloadTime;
+    }
 }
 
 Spaceship.prototype.setPosition = function(x,y) {

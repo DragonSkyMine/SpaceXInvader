@@ -127,8 +127,6 @@ Ennemi.prototype.setParameters = function(elapsed) {
 }
 
 Ennemi.prototype.fireMissile = function(elapsed, joueurPosition) {
-	// on pourrait animer des choses ici
-
     // test des tirs
     this.timeBeforeNextFire -= elapsed;
     if (this.timeBeforeNextFire <= 0) {
