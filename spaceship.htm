@@ -353,6 +353,10 @@ void main(void) {
                 spaceship.missiles[i].setParameters(elapsed);
             }
 
+            for (var i = 0, length = ennemis.length ; i < length ; i++) {
+                ennemis[i].setParameters(elapsed);
+            }
+
             
         }
         lastTime = timeNow;
@@ -380,12 +384,9 @@ void main(void) {
         if(time == spawntime){
             time = 0;
             en = new ennemi();
-            en.setPosition(0,0.5);
+            en.setPosition(Math.random() * (+1 - -1) + -1, Math.random() * (+1 - 0.5) + 1.25);
             this.ennemis.push(en);
         }
-
-
-        //this.ennemis.push(new ennemi());
 
     }
 

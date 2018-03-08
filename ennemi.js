@@ -107,6 +107,8 @@ ennemi.prototype.initParameters = function() {
 
 ennemi.prototype.setParameters = function(elapsed) {
 	// on pourrait animer des choses ici
+	//this.position[0] += 1 * elapsed/1000;
+    this.position[1] -= 1 * elapsed/1000;
 }
 
 ennemi.prototype.setPosition = function(x,y) {
