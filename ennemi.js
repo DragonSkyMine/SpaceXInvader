@@ -64,10 +64,10 @@ function Ennemi(fireType) {
 	var ho2 = 0.5*this.height;
 
 	var vertices = [
-		-wo2,-ho2, -0.5,
-		 wo2,-ho2, -0.5,
-		 wo2, ho2, -0.5,
-		-wo2, ho2, -0.5
+		-wo2,-ho2, -0.6,
+		 wo2,-ho2, -0.6,
+		 wo2, ho2, -0.6,
+		-wo2, ho2, -0.6
 	];
 
 	// on envoie ces positions au GPU ici (et on se rappelle de leur nombre/taille)
@@ -119,6 +119,8 @@ Ennemi.prototype.initParameters = function(fireType) {
 
 Ennemi.prototype.setParameters = function(elapsed) {
 	// on pourrait animer des choses ici
+	//this.position[0] += 1 * elapsed/1000;
+    this.position[1] -= 1 * elapsed/1000;
 }
 
 Ennemi.prototype.fireMissile = function(elapsed, joueurPosition) {
