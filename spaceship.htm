@@ -502,37 +502,44 @@ void main(void) {
     }
 
     function collide() {
-
       // collision des ennemis
-      for (var i = 0, length = ennemis.length ; i < length ; i++) {
-          var ennemi= ennemis[i];
-          if (ennemi !== undefined) {
-            if (rectCollide(ennemi, this.spaceship)) {
-              this.spaceship.takeDamage(20);
-            }
-            // collision des missiles ennemis
-            for (var i2 = 0, length2 = ennemi.missiles.length ; i2 < length2 ; i2++) {
-              var missile = ennemi.missiles[i2];
-              if (rectCollide(missile, this.spaceship)) {
-                this.spaceship.takeDamage(30);
-              }
-            }
-
-            for (var i2 = 0, length2 = this.spaceship.missiles.length ; i2 < length2 ; i2++) {
-              var missile = this.spaceship.missiles[i2];
-              if (rectCollide(missile, ennemi)) {
-                Array.prototype.push.apply(lostMissiles, ennemi.missiles);
-                this.ennemis.splice(this.ennemis.indexOf(ennemi), 1);
-              }
+      for (var i = 0 ; i < this.ennemis.length ; i++) {
+        var ennemi= this.ennemis[i];
+        if (rectCollide(ennemi, this.spaceship)) {
+          this.spaceship.takeDamage(20);
+          removeEnnemi(ennemi);
+          i--;
+        } else {
+          // collision des missiles ennemis
+          for (var i2 = 0; i2 < ennemi.missiles.length ; i2++) {
+            var missile = ennemi.missiles[i2];
+            if (rectCollide(missile, this.spaceship)) {
+              this.spaceship.takeDamage(30);
+              ennemi.removeMissile(i2);
+              i2--;
             }
           }
+
+          for (var i2 = 0 ; i2 < this.spaceship.missiles.length ; i2++) {
+            var missile = this.spaceship.missiles[i2];
+            if (rectCollide(missile, ennemi)) {
+              removeEnnemi(ennemi);
+              this.spaceship.removeMissile(i2);
+              i--;
+              i2--;
+            }
+          }
+        }
+
       }
 
       // collision des missiles perdus
-      for (var i = 0, length = lostMissiles.length ; i < length ; i++) {
+      for (var i = 0; i < lostMissiles.length ; i++) {
         var missile = lostMissiles[i];
         if (rectCollide(missile, this.spaceship)) {
           this.spaceship.takeDamage(30);
+          lostMissiles.splice(i, 1);
+          i--;
         }
       }
     }
@@ -545,6 +552,11 @@ void main(void) {
           return true;
       }
       return false;
+    }
+
+    function removeEnnemi(ennemi) {
+      Array.prototype.push.apply(lostMissiles, ennemi.missiles);
+      this.ennemis.splice(this.ennemis.indexOf(ennemi), 1);
     }
 
     function tick() {
