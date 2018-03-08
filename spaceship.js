@@ -16,6 +16,8 @@ function initSpaceshipShader() {
 
 	spaceshipShader.timeUniform = gl.getUniformLocation(spaceshipShader, "uTime");
 
+	spaceshipShader.invincibleUniform = gl.getUniformLocation(spaceshipShader, "uInvincible");
+
 	// adresse de la variable uniforme uOffset dans le shader
 	spaceshipShader.positionUniform = gl.getUniformLocation(spaceshipShader, "uPosition");
 
@@ -117,6 +119,10 @@ Spaceship.prototype.initParameters = function() {
 	this.missiles = []; // Les tirs du joueur
 	this.fire = false;
 	this.timeBeforeNextFire = 0;
+
+	this.hp = 100;
+	this.invincibleTime = 0;
+	this.invincible = 0.0;
 }
 
 Spaceship.prototype.beginFire = function() {
@@ -131,6 +137,8 @@ Spaceship.prototype.setParameters = function(elapsed) {
 	// on pourrait animer des choses ici
 	this.timer = this.timer+elapsed*0.0004;
 	this.time = Math.max(0.0, Math.sin((this.timer + 0.5) * 0.1) *0.25 + 0.25);
+	this.invincible = this.invincibleTime > 0 ? this.invincibleTime % 8 < 4 ? 1.0 : 0.0 : 0.0;
+	this.invincibleTime = Math.max(0, this.invincibleTime - 1);
 }
 
 Spaceship.prototype.fireMissile = function(elapsed) {
@@ -140,6 +148,15 @@ Spaceship.prototype.fireMissile = function(elapsed) {
         this.missiles.push(new Missile(this.position[0], this.position[1] + this.height/2, 0, this.missileSpeed));
         this.timeBeforeNextFire = this.reloadTime;
     }
+}
+
+Spaceship.prototype.takeDamage = function(damages) {
+	if (this.invincibleTime <= 0) {
+		this.hp -= damages;
+		this.invincibleTime = 50;
+		console.log("took " + damages + " damages");
+		console.log(this.hp + " hp left");
+	}
 }
 
 Spaceship.prototype.setPosition = function(x,y) {
@@ -155,6 +172,7 @@ Spaceship.prototype.shader = function() {
 }
 
 Spaceship.prototype.sendUniformVariables = function() {
+	gl.uniform1f(spaceshipShader.invincibleUniform,this.invincible);
 	gl.uniform1f(spaceshipShader.timeUniform,this.time);
 	gl.uniform2fv(spaceshipShader.positionUniform,this.position);
 }
