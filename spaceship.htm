@@ -3,6 +3,7 @@
 <head>
   <title>SpaceShip</title>
   <meta http-equiv="content-type" content="text/html; charset=windows-1252">
+  <link rel="stylesheet" href="style.css">
 
   <script type="text/javascript" src="gl-matrix.js"></script>
   <script type="text/javascript" src="webgl-utils.js"></script>
@@ -236,6 +237,7 @@ void main(void) {
   vTextureCoord = aVertexCoord;
 }
 </script>
+
 <script id="ennemi-fs" type="x-shader/x-fragment">
 // *** le fragment shader ***
 precision highp float; // precision des nombres flottant
@@ -279,6 +281,9 @@ void main(void) {
     var background; // l'objet background, sa g�om�trie, son shader
     var spaceship; // l'objet spaceship, sa g�om�trie, son shader
     var weather;  // l'objet weather, sa g�om�trie, son shader
+    var ennemis = []; // Les ennemis
+    var deathEnnemis = []; // Les ennemis tués par le joueur
+    var lostMissiles = []; // Les missiles dont le propriétaires n'existe plus (pour continuer de les afficher)
 
     function drawScene() {
         // initialisation du viewport
@@ -315,6 +320,27 @@ void main(void) {
         gl.useProgram(spaceship.shader());
         spaceship.sendUniformVariables();
         spaceship.draw();
+
+        // dessin d'un enemie
+        for (var i = 0, length = ennemis.length ; i < length ; i++) {
+            // dessin des missiles de l'ennemi
+            for (var i2 = 0, length2 = ennemis[i].missiles.length ; i2 < length2 ; i2++) {
+                gl.useProgram(ennemis[i].missiles[i2].shader());
+                ennemis[i].missiles[i2].sendUniformVariables();
+                ennemis[i].missiles[i2].draw();
+            }
+
+            gl.useProgram(ennemis[i].shader());
+            ennemis[i].sendUniformVariables();
+            ennemis[i].draw();
+        }
+
+        // dessin des missiles perdus
+        for (var i = 0, length = lostMissiles.length ; i < length ; i++) {
+            gl.useProgram(lostMissiles[i].shader());
+            lostMissiles[i].sendUniformVariables();
+            lostMissiles[i].draw();
+        }
 
         gl.useProgram(weather.shader());
         weather.sendUniformVariables();
@@ -370,8 +396,24 @@ void main(void) {
             background.setParameters(elapsed);
             weather.setParameters(elapsed);
 
+            // annimation des missiles du joueur
             for (var i = 0, length = spaceship.missiles.length ; i < length ; i++) {
                 spaceship.missiles[i].setParameters(elapsed);
+            };
+
+            // annimation des ennemis et de leurs missiles
+            for (var i = 0, length = ennemis.length ; i < length ; i++) {
+                ennemis[i].setParameters(elapsed);
+
+                // annimation des missiles des ennemis
+                for (var i2 = 0, length2 = ennemis[i].missiles.length ; i2 < length2 ; i2++) {
+                    ennemis[i].missiles[i2].setParameters(elapsed);
+                }
+            }
+
+            // annimation des missiles perdus
+            for (var i = 0, length = lostMissiles.length ; i < length ; i++) {
+                lostMissiles[i].setParameters(elapsed);
             }
         }
         lastTime = timeNow;
@@ -386,12 +428,77 @@ void main(void) {
                 i--;
             }
         }
+
+        // Pour les ennemis et leurs missiles
+        for (var i = 0 ; i < ennemis.length ; i++) {
+            for (var i2 = 0 ; i2 < ennemis[i].missiles.length ; i2++) {
+                let position = ennemis[i].missiles[i2].position;
+                let height = ennemis[i].missiles[i2].height;
+                let width = ennemis[i].missiles[i2].width;
+                if (position[0] > 1 + width/2 || position[0] < -1 - width/2
+                    || position[1] > 1 + height/2 || position[1] < -1 - height/2){
+                    ennemis[i].removeMissile(i2);
+                    i2--;
+                }
+            }
+
+            if (ennemis[i].position[1] < -1 - ennemis[i].height/2){
+                Array.prototype.push.apply(lostMissiles, ennemis[i].missiles);
+                ennemis.splice(i, 1);
+                i--;
+            }
+        }
+
+        // Pour les missiles perdus
+        for (var i = 0 ; i < lostMissiles.length ; i++) {
+            let position = lostMissiles[i].position;
+            let height = lostMissiles[i].height;
+            let width = lostMissiles[i].width;
+            if (position[0] > 1 + width/2 || position[0] < -1 - width/2
+                || position[1] > 1 + height/2 || position[1] < -1 - height/2){
+                lostMissiles.splice(i, 1);
+                i--;
+            }
+        }
+    }
+
+    // Tire les missiles
+    function fireMissile() {
+        var timeNow = new Date().getTime();
+        if (lastTime != 0) {
+            var elapsed = timeNow - lastTime;
+
+            spaceship.fireMissile(elapsed);
+
+            for (var i = 0, length = ennemis.length ; i < length ; i++) {
+                ennemis[i].fireMissile(elapsed, spaceship.position);
+            }
+        }
+    }
+
+    var time = 0;
+    var spawntime = 100;
+
+    // Fonction qui va generer des ennemis aléatoire
+    function generateEnnemi(){
+        
+        time = time+1;
+
+        if(time == spawntime){
+            time = 0;
+            en = new Ennemi(1, 0.8, 1000);
+            en.setPosition(Math.random() * (+1 - -1) + -1, Math.random() * (+1 - 0.5) + 1.25);
+            this.ennemis.push(en);
+        }
+
     }
 
     function tick() {
         requestAnimFrame(tick);
         handleKeys();
         outOfMap();
+        fireMissile();
+        generateEnnemi();
         drawScene();
         animate();
     }
@@ -411,16 +518,19 @@ void main(void) {
         initSpaceshipShader();
         initMissileShader();
         initweatherShader();
+        initEnnemiShader(); //ph
 
         // init des textures
         initSpaceshipTexture();
         initMissileTexture();
+        initEnnemiTexture(); //ph
 
         // init de tous les objets
         heightfield = new Heightfield();
         background = new Background(fbo.texture(0));
         spaceship = new Spaceship();
         weather = new Weather();
+        // this.ennemis.push(new ennemi());
 
         // la couleur de fond sera noire
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -449,5 +559,28 @@ void main(void) {
 
 <body onload="webGLStart();">
   <canvas id="SpaceShip" style="border: none; cursor: none;" width="800" height="800"></canvas>
+
+  <div class="menu">
+
+    <div class="logo">
+      <img src="img/logo.png" alt="logo" id="logo">
+      <hr style="margin-top: -5px;">
+    </div>
+
+    <div class="stat">
+      <div class="pv">
+        <p>Life Point</p>
+      </div>
+      <hr style="width: 70%; margin: auto;">
+      <div class="kill">
+        <p>Ennemi Killed</p>
+      </div>
+      <hr style="">
+    </div>
+
+    <div class="story">
+    </div>
+
+  </div>
 </body>
 </html>

@@ -1,6 +1,6 @@
 var ennemiShader;
 
-function initennemiShader() {
+function initEnnemiShader() {
 	ennemiShader = initShaders("ennemi-vs","ennemi-fs");
 
     // active ce shader
@@ -25,7 +25,7 @@ function initennemiShader() {
 
 var ennemiTexture;
 
-function initennemiTexture() {
+function initEnnemiTexture() {
     // creation de la texture
     ennemiTexture = gl.createTexture();
     ennemiTexture.image = new Image();
@@ -49,11 +49,11 @@ function initennemiTexture() {
         gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
-    ennemiTexture.image.src = "img/falcon.png";
+    ennemiTexture.image.src = "img/ennemi.png";
 }
 
-function ennemi() {
-	this.initParameters();
+function Ennemi(fireType, missileSpeed, reloadTime) {
+	this.initParameters(fireType, missileSpeed, reloadTime);
 
 	// cree un nouveau buffer sur le GPU et l'active
 	this.vertexBuffer = gl.createBuffer();
@@ -64,10 +64,10 @@ function ennemi() {
 	var ho2 = 0.5*this.height;
 
 	var vertices = [
-		-wo2,-ho2, -0.5,
-		 wo2,-ho2, -0.5,
-		 wo2, ho2, -0.5,
-		-wo2, ho2, -0.5
+		-wo2,-ho2, -0.6,
+		 wo2,-ho2, -0.6,
+		 wo2, ho2, -0.6,
+		-wo2, ho2, -0.6
 	];
 
 	// on envoie ces positions au GPU ici (et on se rappelle de leur nombre/taille)
@@ -99,29 +99,82 @@ function ennemi() {
     console.log("ennemi initialized");
 }
 
-ennemi.prototype.initParameters = function() {
-	this.width = 0.160;
-	this.height = 0.50;
+Ennemi.prototype.initParameters = function(fireType, missileSpeed, reloadTime) {
+	this.width = 0.25;
+	this.height = 0.25;
 	this.position = [0.0,-0.7];
+
+	// Type de tirs
+	this.fireType = fireType;
+
+    // temps de rechagement (ms)
+    this.reloadTime = reloadTime;
+
+    // vitesse du missile
+    this.missileSpeed = missileSpeed;
+
+    this.missiles = []; // Les missiles
+    this.timeBeforeNextFire = 0;
 }
 
-ennemi.prototype.setParameters = function(elapsed) {
+Ennemi.prototype.setParameters = function(elapsed) {
 	// on pourrait animer des choses ici
+	//this.position[0] += 1 * elapsed/1000;
+    this.position[1] -= 1 * elapsed/1000;
 }
 
-ennemi.prototype.setPosition = function(x,y) {
+Ennemi.prototype.fireMissile = function(elapsed, joueurPosition) {
+	// on pourrait animer des choses ici
+
+    // test des tirs
+    this.timeBeforeNextFire -= elapsed;
+    if (this.timeBeforeNextFire <= 0) {
+        let positionTireMissile = [this.position[0], this.position[1] - this.height/2];
+
+        if (this.fireType === 1){
+            // Type 1 : tire sur le joueur
+
+            // calcule des vitesses pour atteindre le joueur
+            let vectorMissile = [0, this.missileSpeed];
+            let vectorJoueur = [joueurPosition[0] - positionTireMissile[0], joueurPosition[1] - positionTireMissile[1]];
+            let cosVector = (vectorMissile[1]*vectorJoueur[1]) / (vectorMissile[1] * Math.sqrt(vectorJoueur[0]**2+vectorJoueur[1]**2));
+            let sinVector = (vectorMissile[1]*vectorJoueur[0]) / (vectorMissile[1] * Math.sqrt(vectorJoueur[0]**2+vectorJoueur[1]**2));
+            let speedMissile = [sinVector * this.missileSpeed, cosVector * this.missileSpeed];
+
+            this.missiles.push(new Missile(positionTireMissile[0], positionTireMissile[1], speedMissile[0], speedMissile[1]));
+        }else if (this.fireType === 2) {
+            // Type 2 : tire droit
+
+            this.missiles.push(new Missile(positionTireMissile[0], positionTireMissile[1], 0, -this.missileSpeed));
+        }else if (this.fireType === 3) {
+            // Type 3 : 3 tirs en cône
+
+            this.missiles.push(new Missile(positionTireMissile[0], positionTireMissile[1], 0, -this.missileSpeed));
+            this.missiles.push(new Missile(positionTireMissile[0], positionTireMissile[1], -this.missileSpeed*0.1, -this.missileSpeed*0.9));
+            this.missiles.push(new Missile(positionTireMissile[0], positionTireMissile[1], this.missileSpeed*0.1, -this.missileSpeed*0.9));
+        }
+
+        this.timeBeforeNextFire = this.reloadTime;
+    }
+}
+
+Ennemi.prototype.setPosition = function(x,y) {
 	this.position = [x,y];
 }
 
-ennemi.prototype.shader = function() {
+Ennemi.prototype.removeMissile = function(missileIndex) {
+    this.missiles.splice(missileIndex, 1);
+}
+
+Ennemi.prototype.shader = function() {
 	return ennemiShader;
 }
 
-ennemi.prototype.sendUniformVariables = function() {
+Ennemi.prototype.sendUniformVariables = function() {
 	gl.uniform2fv(ennemiShader.positionUniform,this.position);
 }
 
-ennemi.prototype.draw = function() {
+Ennemi.prototype.draw = function() {
 	// active le buffer de position et fait le lien avec l'attribut aVertexPosition dans le shader
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
 	gl.vertexAttribPointer(ennemiShader.vertexPositionAttribute, this.vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);

@@ -96,7 +96,7 @@ function Missile(x, y, speedX, speedY) {
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(tri), gl.STATIC_DRAW);
     this.triangles.numItems = 6;
 
-    console.log("missile initialized");
+    //console.log("missile initialized");
 }
 
 Missile.prototype.initParameters = function(x, y, speedX, speedY) {

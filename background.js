@@ -15,7 +15,7 @@ function initBackgroundShader() {
     gl.enableVertexAttribArray(backgroundShader.vertexCoordAttribute);
 
      // adresse de la texture uHeightfield dans le shader
-		backgroundShader.timeUniform = gl.getUniformLocation(backgroundShader, "uTime");
+	backgroundShader.timeUniform = gl.getUniformLocation(backgroundShader, "uTime");
     backgroundShader.heightfieldUniform = gl.getUniformLocation(backgroundShader, "uHeightfield");
     backgroundShader.textureSizeUniform = gl.getUniformLocation(backgroundShader, "uTextureSize");
 
@@ -79,7 +79,8 @@ Background.prototype.initParameters = function() {
 Background.prototype.setParameters = function(elapsed) {
 	// we could animate something here
 	this.timer = this.timer+elapsed*0.0004;
-	this.time = -Math.sin((this.timer + 0.5) * 5.0) *0.25 + 0.25;
+	this.time = Math.sin((this.timer + 0.5) * 0.1) *0.25 + 0.25;
+	//console.log(this.time);
 }
 
 Background.prototype.sendUniformVariables = function() {
