@@ -79,7 +79,8 @@ Background.prototype.initParameters = function() {
 Background.prototype.setParameters = function(elapsed) {
 	// we could animate something here
 	this.timer = this.timer+elapsed*0.0004;
-	this.time = this.timer % 24000;
+	this.time = Math.sin((this.timer + 0.5) * 0.1) *0.25 + 0.25;
+	console.log(this.time);
 }
 
 Background.prototype.sendUniformVariables = function() {

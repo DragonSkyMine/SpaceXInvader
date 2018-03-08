@@ -117,7 +117,7 @@ vec3 shade(in vec3 n,in float d) {
 
     // TODO : le shading !
     // la fonction prend en entrée la normale du terrain et sa profondeur
-    float contrast = 0.2;
+    float contrast =  max(0.0, 0.25 - (uTime * 0.25));
     vec3 r = reflect(l, n);
     vec3 couleur = vec3(0.1, 0.08, 0.05);
     vec3 diffuse = vec3(0.7, 0.3, 0.1) + (d * contrast);
@@ -128,7 +128,7 @@ vec3 shade(in vec3 n,in float d) {
 
 
     // la couleur est attribuee au fragment courant
-    n = (couleur + kdnl + ksvr);
+    n = (couleur + kdnl + ksvr) - uTime;
 
     return n;
 }
@@ -257,7 +257,7 @@ void main(void) {
         // initialisation du viewport
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         // efface les buffers de couleur et de profondeur
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
