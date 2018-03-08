@@ -125,6 +125,10 @@ Spaceship.prototype.stopFire = function() {
 
 Spaceship.prototype.setParameters = function(elapsed) {
 	// on pourrait animer des choses ici
+}
+
+Spaceship.prototype.fireMissile = function(elapsed) {
+	// on pourrait animer des choses ici
 
     // test des tirs
     this.timeBeforeNextFire -= elapsed;

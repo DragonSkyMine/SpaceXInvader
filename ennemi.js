@@ -1,6 +1,6 @@
 var ennemiShader;
 
-function initennemiShader() {
+function initEnnemiShader() {
 	ennemiShader = initShaders("ennemi-vs","ennemi-fs");
 
     // active ce shader
@@ -25,7 +25,7 @@ function initennemiShader() {
 
 var ennemiTexture;
 
-function initennemiTexture() {
+function initEnnemiTexture() {
     // creation de la texture
     ennemiTexture = gl.createTexture();
     ennemiTexture.image = new Image();
@@ -52,7 +52,7 @@ function initennemiTexture() {
     ennemiTexture.image.src = "img/ennemi.png";
 }
 
-function ennemi(fireType) {
+function Ennemi(fireType) {
 	this.initParameters(fireType);
 
 	// cree un nouveau buffer sur le GPU et l'active
@@ -99,7 +99,7 @@ function ennemi(fireType) {
     console.log("ennemi initialized");
 }
 
-ennemi.prototype.initParameters = function(fireType) {
+Ennemi.prototype.initParameters = function(fireType) {
 	this.width = 0.25;
 	this.height = 0.25;
 	this.position = [0.0,-0.7];
@@ -117,13 +117,17 @@ ennemi.prototype.initParameters = function(fireType) {
     this.timeBeforeNextFire = 0;
 }
 
-ennemi.prototype.setParameters = function(elapsed, joueurPosition) {
+Ennemi.prototype.setParameters = function(elapsed) {
+	// on pourrait animer des choses ici
+}
+
+Ennemi.prototype.fireMissile = function(elapsed, joueurPosition) {
 	// on pourrait animer des choses ici
 
     // test des tirs
     this.timeBeforeNextFire -= elapsed;
     if (this.timeBeforeNextFire <= 0) {
-        let positionTireMissile = [positionMissile[0], this.position[1] - this.height/2];
+        let positionTireMissile = [this.position[0], this.position[1] - this.height/2];
 
         if (this.fireType === 1){
             // Type 1 : tire sur le joueur
@@ -152,7 +156,7 @@ ennemi.prototype.setParameters = function(elapsed, joueurPosition) {
     }
 }
 
-ennemi.prototype.setPosition = function(x,y) {
+Ennemi.prototype.setPosition = function(x,y) {
 	this.position = [x,y];
 }
 
@@ -160,15 +164,15 @@ Spaceship.prototype.removeMissile = function(missileIndex) {
     this.missiles.splice(missileIndex, 1);
 }
 
-ennemi.prototype.shader = function() {
+Ennemi.prototype.shader = function() {
 	return ennemiShader;
 }
 
-ennemi.prototype.sendUniformVariables = function() {
+Ennemi.prototype.sendUniformVariables = function() {
 	gl.uniform2fv(ennemiShader.positionUniform,this.position);
 }
 
-ennemi.prototype.draw = function() {
+Ennemi.prototype.draw = function() {
 	// active le buffer de position et fait le lien avec l'attribut aVertexPosition dans le shader
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
 	gl.vertexAttribPointer(ennemiShader.vertexPositionAttribute, this.vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
