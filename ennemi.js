@@ -49,7 +49,7 @@ function initennemiTexture() {
         gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
-    ennemiTexture.image.src = "img/falcon.png";
+    ennemiTexture.image.src = "img/ennemi.png";
 }
 
 function ennemi(fireType) {
@@ -100,8 +100,8 @@ function ennemi(fireType) {
 }
 
 ennemi.prototype.initParameters = function(fireType) {
-	this.width = 0.160;
-	this.height = 0.50;
+	this.width = 0.25;
+	this.height = 0.25;
 	this.position = [0.0,-0.7];
 
 	// Type de tirs
