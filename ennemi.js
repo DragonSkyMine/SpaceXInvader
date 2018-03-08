@@ -52,8 +52,8 @@ function initEnnemiTexture() {
     ennemiTexture.image.src = "img/ennemi.png";
 }
 
-function Ennemi(fireType) {
-	this.initParameters(fireType);
+function Ennemi(fireType, missileSpeed, reloadTime) {
+	this.initParameters(fireType, missileSpeed, reloadTime);
 
 	// cree un nouveau buffer sur le GPU et l'active
 	this.vertexBuffer = gl.createBuffer();
@@ -99,7 +99,7 @@ function Ennemi(fireType) {
     console.log("ennemi initialized");
 }
 
-Ennemi.prototype.initParameters = function(fireType) {
+Ennemi.prototype.initParameters = function(fireType, missileSpeed, reloadTime) {
 	this.width = 0.25;
 	this.height = 0.25;
 	this.position = [0.0,-0.7];
@@ -108,10 +108,10 @@ Ennemi.prototype.initParameters = function(fireType) {
 	this.fireType = fireType;
 
     // temps de rechagement (ms)
-    this.reloadTime = 200;
+    this.reloadTime = reloadTime;
 
     // vitesse du missile
-    this.missileSpeed = 1;
+    this.missileSpeed = missileSpeed;
 
     this.missiles = []; // Les missiles
     this.timeBeforeNextFire = 0;
@@ -150,8 +150,8 @@ Ennemi.prototype.fireMissile = function(elapsed, joueurPosition) {
             // Type 3 : 3 tirs en cône
 
             this.missiles.push(new Missile(positionTireMissile[0], positionTireMissile[1], 0, -this.missileSpeed));
-            this.missiles.push(new Missile(positionTireMissile[0], positionTireMissile[1], -this.missileSpeed*0.5, -this.missileSpeed*0.5));
-            this.missiles.push(new Missile(positionTireMissile[0], positionTireMissile[1], this.missileSpeed*0.5, -this.missileSpeed*0.5));
+            this.missiles.push(new Missile(positionTireMissile[0], positionTireMissile[1], -this.missileSpeed*0.1, -this.missileSpeed*0.9));
+            this.missiles.push(new Missile(positionTireMissile[0], positionTireMissile[1], this.missileSpeed*0.1, -this.missileSpeed*0.9));
         }
 
         this.timeBeforeNextFire = this.reloadTime;
@@ -162,7 +162,7 @@ Ennemi.prototype.setPosition = function(x,y) {
 	this.position = [x,y];
 }
 
-Spaceship.prototype.removeMissile = function(missileIndex) {
+Ennemi.prototype.removeMissile = function(missileIndex) {
     this.missiles.splice(missileIndex, 1);
 }
 
