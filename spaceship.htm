@@ -277,17 +277,17 @@ void main(void) {
         background.sendUniformVariables();
         background.draw();
 
-        // dessin du vaisseau (shader par defaut ici)
-        gl.useProgram(spaceship.shader());
-        spaceship.sendUniformVariables();
-        spaceship.draw();
-
         // dessin des missiles du joueur
         for (var i = 0, length = spaceship.missiles.length ; i < length ; i++) {
             gl.useProgram(spaceship.missiles[i].shader());
             spaceship.missiles[i].sendUniformVariables();
             spaceship.missiles[i].draw();
         }
+
+        // dessin du vaisseau (shader par defaut ici)
+        gl.useProgram(spaceship.shader());
+        spaceship.sendUniformVariables();
+        spaceship.draw();
     }
 
     // une bonne mani�re de gerer les evenements claviers
