@@ -481,8 +481,8 @@ void main(void) {
 
     // Fonction qui va generer des ennemis aléatoire
     function generateEnnemi(){
-        
-        //time = time+1;
+
+        time = time+1;
 
         if(time == spawntime){
             time = 0;
@@ -493,7 +493,7 @@ void main(void) {
             en.setPosition(x,y);
             this.ennemis.push(en);
 
-            spawntime -= spawntime/50;
+            spawntime -= Math.round(spawntime/50);
             console.log(spawntime);
 
         }
