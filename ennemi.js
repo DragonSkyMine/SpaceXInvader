@@ -123,7 +123,7 @@ Ennemi.prototype.setParameters = function(elapsed) {
 	this.timer = this.timer+elapsed*0.0004;
 	var posX = Math.sin((this.timer*0.1 + 0.5) * 75.0) *5.0 + 0.25;
 	this.position[0] =  this.initX + posX/50;
-	this.position[1] -= 1 * elapsed/3000;
+	this.position[1] -= 1 * elapsed/2000;
 }
 
 Ennemi.prototype.fireMissile = function(elapsed, joueurPosition) {

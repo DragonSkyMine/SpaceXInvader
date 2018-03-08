@@ -136,7 +136,7 @@ Spaceship.prototype.stopFire = function() {
 Spaceship.prototype.setParameters = function(elapsed) {
 	// on pourrait animer des choses ici
 	this.timer = this.timer+elapsed*0.0004;
-	this.time = Math.max(0.0, Math.sin((this.timer + 0.5) * 0.1) *0.25 + 0.25);
+	this.time = Math.max(0.0, Math.sin((this.timer + 25.0) * 0.1) *0.25 + 0.25);
 	this.invincible = this.invincibleTime > 0 ? this.invincibleTime % 8 < 4 ? 1.0 : 0.0 : 0.0;
 	this.invincibleTime = Math.max(0, this.invincibleTime - 1);
 }
