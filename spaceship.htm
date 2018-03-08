@@ -253,7 +253,9 @@ void main(void) {
     var heightfield; // l'objet heightfield, sa g�om�trie, son shader
     var background; // l'objet background, sa g�om�trie, son shader
     var spaceship; // l'objet spaceship, sa g�om�trie, son shader
-    var ennemis = [];
+    var ennemis = []; // Les ennemis
+    var deathEnnemis = []; // Les ennemis tués par le joueur
+    var lostMissiles = []; // Les missiles dont le propriétaires n'existe plus (pour continuer de les afficher)
 
     function drawScene() {
         // initialisation du viewport
@@ -291,9 +293,9 @@ void main(void) {
         spaceship.sendUniformVariables();
         spaceship.draw();
 
-        // dessin d'un enemie 
+        // dessin d'un enemie
         for (var i = 0, length = ennemis.length ; i < length ; i++) {
-            // dessin des missiles des ennemis
+            // dessin des missiles de l'ennemi
             for (var i2 = 0, length2 = ennemis[i].missiles.length ; i2 < length2 ; i2++) {
                 gl.useProgram(ennemis[i].missiles[i2].shader());
                 ennemis[i].missiles[i2].sendUniformVariables();
@@ -305,6 +307,12 @@ void main(void) {
             ennemis[i].draw();
         }
 
+        // dessin des missiles perdus
+        for (var i = 0, length = lostMissiles.length ; i < length ; i++) {
+            gl.useProgram(lostMissiles[i].shader());
+            lostMissiles[i].sendUniformVariables();
+            lostMissiles[i].draw();
+        }
     }
 
     // une bonne mani�re de gerer les evenements claviers
@@ -355,11 +363,12 @@ void main(void) {
             spaceship.setParameters(elapsed);
             background.setParameters(elapsed);
 
-            // annimation des missiles
+            // annimation des missiles du joueur
             for (var i = 0, length = spaceship.missiles.length ; i < length ; i++) {
                 spaceship.missiles[i].setParameters(elapsed);
-            }
+            };
 
+            // annimation des ennemis et de leurs missiles
             for (var i = 0, length = ennemis.length ; i < length ; i++) {
                 ennemis[i].setParameters(elapsed);
 
@@ -367,6 +376,11 @@ void main(void) {
                 for (var i2 = 0, length2 = ennemis[i].missiles.length ; i2 < length2 ; i2++) {
                     ennemis[i].missiles[i2].setParameters(elapsed);
                 }
+            }
+
+            // annimation des missiles perdus
+            for (var i = 0, length = lostMissiles.length ; i < length ; i++) {
+                lostMissiles[i].setParameters(elapsed);
             }
         }
         lastTime = timeNow;
@@ -382,16 +396,8 @@ void main(void) {
             }
         }
 
-        // Pour les ennemis
+        // Pour les ennemis et leurs missiles
         for (var i = 0 ; i < ennemis.length ; i++) {
-            if (ennemis[i].position[1] < -1 - ennemis[i].height/2){
-                ennemis.splice(i, 1);
-                i--;
-            }
-        }
-
-        // Pour les missiles de l'ennemis
-        for (var i = 0, length = ennemis.length ; i < length ; i++) {
             for (var i2 = 0 ; i2 < ennemis[i].missiles.length ; i2++) {
                 let position = ennemis[i].missiles[i2].position;
                 let height = ennemis[i].missiles[i2].height;
@@ -401,6 +407,24 @@ void main(void) {
                     ennemis[i].removeMissile(i2);
                     i2--;
                 }
+            }
+
+            if (ennemis[i].position[1] < -1 - ennemis[i].height/2){
+                Array.prototype.push.apply(lostMissiles, ennemis[i].missiles);
+                ennemis.splice(i, 1);
+                i--;
+            }
+        }
+
+        // Pour les missiles perdus
+        for (var i = 0 ; i < lostMissiles.length ; i++) {
+            let position = lostMissiles[i].position;
+            let height = lostMissiles[i].height;
+            let width = lostMissiles[i].width;
+            if (position[0] > 1 + width/2 || position[0] < -1 - width/2
+                || position[1] > 1 + height/2 || position[1] < -1 - height/2){
+                lostMissiles.splice(i, 1);
+                i--;
             }
         }
     }
