@@ -233,6 +233,7 @@ void main(void) {
   vTextureCoord = aVertexCoord;
 }
 </script>
+
 <script id="ennemi-fs" type="x-shader/x-fragment">
 // *** le fragment shader ***
 precision highp float; // precision des nombres flottant
@@ -252,6 +253,7 @@ void main(void) {
     var heightfield; // l'objet heightfield, sa g�om�trie, son shader
     var background; // l'objet background, sa g�om�trie, son shader
     var spaceship; // l'objet spaceship, sa g�om�trie, son shader
+    var ennemis = [];
 
     function drawScene() {
         // initialisation du viewport
@@ -288,6 +290,14 @@ void main(void) {
         gl.useProgram(spaceship.shader());
         spaceship.sendUniformVariables();
         spaceship.draw();
+
+        // dessin d'un enemie 
+        for (var i = 0, length = ennemis.length ; i < length ; i++) {
+            gl.useProgram(ennemis[i].shader());
+            ennemis[i].sendUniformVariables();
+            ennemis[i].draw();
+        }
+
     }
 
     // une bonne mani�re de gerer les evenements claviers
@@ -341,6 +351,8 @@ void main(void) {
             for (var i = 0, length = spaceship.missiles.length ; i < length ; i++) {
                 spaceship.missiles[i].setParameters(elapsed);
             }
+
+            
         }
         lastTime = timeNow;
     }
@@ -356,10 +368,31 @@ void main(void) {
         }
     }
 
+    var time = 0;
+    var spawntime = 100;
+
+    // Fonction qui va generer des ennemis aléatoire
+    function generateEnnemi(){
+        
+        time = time+1;
+
+        if(time == spawntime){
+            time = 0;
+            en = new ennemi();
+            en.setPosition(0,0.5);
+            this.ennemis.push(en);
+        }
+
+
+        //this.ennemis.push(new ennemi());
+
+    }
+
     function tick() {
         requestAnimFrame(tick);
         handleKeys();
         outOfMap();
+        generateEnnemi();
         drawScene();
         animate();
     }
@@ -378,15 +411,18 @@ void main(void) {
         initBackgroundShader();
         initSpaceshipShader();
         initMissileShader();
+        initennemiShader(); //ph
 
         // init des textures
         initSpaceshipTexture();
         initMissileTexture();
+        initennemiTexture(); //ph
 
         // init de tous les objets
         heightfield = new Heightfield();
         background = new Background(fbo.texture(0));
         spaceship = new Spaceship();
+        // this.ennemis.push(new ennemi());
 
         // la couleur de fond sera noire
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
