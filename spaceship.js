@@ -130,7 +130,7 @@ Spaceship.prototype.stopFire = function() {
 Spaceship.prototype.setParameters = function(elapsed) {
 	// on pourrait animer des choses ici
 	this.timer = this.timer+elapsed*0.0004;
-	this.time = Math.max(0.0, -Math.sin((this.timer + 0.5) * 5.0) *0.25 + 0.25);
+	this.time = Math.max(0.0, -Math.sin((this.timer + 0.5) * 0.1) *0.25 + 0.25);
 	// test des tirs
 	this.timeBeforeNextFire -= elapsed;
 	if (this.fire && this.timeBeforeNextFire <= 0) {
