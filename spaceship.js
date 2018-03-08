@@ -137,7 +137,7 @@ Spaceship.prototype.fireMissile = function(elapsed) {
     // test des tirs
     this.timeBeforeNextFire -= elapsed;
     if (this.fire && this.timeBeforeNextFire <= 0) {
-        this.missiles.push(new Missile(this.position[0], this.position[1] + this.height/2, 0, this.missileSpeed));
+        this.missiles.push(new Missile(this.position[0], this.position[1] + this.height/2, 0, this.missileSpeed, true));
         this.timeBeforeNextFire = this.reloadTime;
     }
 }

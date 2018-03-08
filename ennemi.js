@@ -142,17 +142,17 @@ Ennemi.prototype.fireMissile = function(elapsed, joueurPosition) {
             let sinVector = (vectorMissile[1]*vectorJoueur[0]) / (vectorMissile[1] * Math.sqrt(vectorJoueur[0]**2+vectorJoueur[1]**2));
             let speedMissile = [sinVector * this.missileSpeed, cosVector * this.missileSpeed];
 
-            this.missiles.push(new Missile(positionTireMissile[0], positionTireMissile[1], speedMissile[0], speedMissile[1]));
+            this.missiles.push(new Missile(positionTireMissile[0], positionTireMissile[1], speedMissile[0], speedMissile[1], false));
         }else if (this.fireType === 2) {
             // Type 2 : tire droit
 
-            this.missiles.push(new Missile(positionTireMissile[0], positionTireMissile[1], 0, -this.missileSpeed));
+            this.missiles.push(new Missile(positionTireMissile[0], positionTireMissile[1], 0, -this.missileSpeed, false));
         }else if (this.fireType === 3) {
             // Type 3 : 3 tirs en cône
 
-            this.missiles.push(new Missile(positionTireMissile[0], positionTireMissile[1], 0, -this.missileSpeed));
-            this.missiles.push(new Missile(positionTireMissile[0], positionTireMissile[1], -this.missileSpeed*0.1, -this.missileSpeed*0.9));
-            this.missiles.push(new Missile(positionTireMissile[0], positionTireMissile[1], this.missileSpeed*0.1, -this.missileSpeed*0.9));
+            this.missiles.push(new Missile(positionTireMissile[0], positionTireMissile[1], 0, -this.missileSpeed, false));
+            this.missiles.push(new Missile(positionTireMissile[0], positionTireMissile[1], -this.missileSpeed*0.1, -this.missileSpeed*0.9, false));
+            this.missiles.push(new Missile(positionTireMissile[0], positionTireMissile[1], this.missileSpeed*0.1, -this.missileSpeed*0.9, false));
         }
 
         this.timeBeforeNextFire = this.reloadTime;

@@ -23,19 +23,20 @@ function initMissileShader() {
     console.log("missile shader initialized");
 }
 
-var missileTexture;
+var missileTextureSpaceShip;
+var missileTextureEnnemi;
 
 function initMissileTexture() {
     // creation de la texture
-    missileTexture = gl.createTexture();
-    missileTexture.image = new Image();
-    missileTexture.image.onload = function () {
+    missileTextureSpaceShip = gl.createTexture();
+    missileTextureSpaceShip.image = new Image();
+    missileTextureSpaceShip.image.onload = function () {
         // active la texture (les operations qui suivent feront effet sur celle-ci)
-        gl.bindTexture(gl.TEXTURE_2D, missileTexture);
+        gl.bindTexture(gl.TEXTURE_2D, missileTextureSpaceShip);
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
         // envoie les donnees sur GPU
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, missileTexture.image);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, missileTextureSpaceShip.image);
 
         // options (filtrage+effets de bordure)
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -49,11 +50,36 @@ function initMissileTexture() {
         gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
-    missileTexture.image.src = "img/tesla.png";
+    missileTextureSpaceShip.image.src = "img/tesla.png";
+
+    // creation de la texture
+    missileTextureEnnemi = gl.createTexture();
+    missileTextureEnnemi.image = new Image();
+    missileTextureEnnemi.image.onload = function () {
+        // active la texture (les operations qui suivent feront effet sur celle-ci)
+        gl.bindTexture(gl.TEXTURE_2D, missileTextureEnnemi);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+
+        // envoie les donnees sur GPU
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, missileTextureEnnemi.image);
+
+        // options (filtrage+effets de bordure)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+        gl.generateMipmap(gl.TEXTURE_2D, gl.LINEAR_MIPMAP_LINEAR);
+
+        // desactive la texture courante
+        gl.bindTexture(gl.TEXTURE_2D, null);
+    }
+
+    missileTextureEnnemi.image.src = "img/petrol.png";
 }
 
-function Missile(x, y, speedX, speedY) {
-	this.initParameters(x, y, speedX, speedY);
+function Missile(x, y, speedX, speedY, fromSpaceShip = true) {
+	this.initParameters(x, y, speedX, speedY, fromSpaceShip);
 
 	// cree un nouveau buffer sur le GPU et l'active
 	this.vertexBuffer = gl.createBuffer();
@@ -99,11 +125,12 @@ function Missile(x, y, speedX, speedY) {
     //console.log("missile initialized");
 }
 
-Missile.prototype.initParameters = function(x, y, speedX, speedY) {
+Missile.prototype.initParameters = function(x, y, speedX, speedY, fromSpaceShip) {
 	this.width = 0.05;
 	this.height = 0.1;
 	this.position = [x, y];
 	this.speed = [speedX, speedY];
+	this.fromSpaceShip = fromSpaceShip;
 }
 
 Missile.prototype.setParameters = function(elapsed) {
@@ -129,9 +156,14 @@ Missile.prototype.draw = function() {
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.coordBuffer);
 	gl.vertexAttribPointer(missileShader.vertexCoordAttribute, this.coordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
+	let texture = missileTextureSpaceShip;
+	if (!this.fromSpaceShip){
+        texture = missileTextureEnnemi;
+    }
+
     // envoie la texture au shader
     gl.activeTexture(gl.TEXTURE0); // on active l'unite de texture 0
-    gl.bindTexture(gl.TEXTURE_2D, missileTexture); // on place maTexture dans l'unité active
+    gl.bindTexture(gl.TEXTURE_2D, texture); // on place maTexture dans l'unité active
     gl.uniform1i(missileShader.textureUniform, 0); // on dit au shader que maTextureUniform se trouve sur l'unite de texture 0
 
 
