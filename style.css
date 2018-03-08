@@ -1,0 +1,35 @@
+@font-face {
+  font-family: "SpaceFont";
+  src: url('space_age.ttf');
+}
+
+html {
+    -moz-user-select: -moz-none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+body {
+  background-color: #222;
+  font-family: 'SpaceFont';
+}
+
+p {
+  text-align: center;
+}
+
+.menu {
+  position: absolute;
+  top: 8px;
+  left: 820px;
+  background: lightgrey;
+  width: 350px;
+  height: 800px;
+}
+
+#logo {
+  position: relative;
+  left: 25px;
+}
