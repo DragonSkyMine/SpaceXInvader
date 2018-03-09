@@ -318,20 +318,22 @@ void main(void) {
             spaceship.missiles[i].draw();
         }
 
-        // dessin du vaisseau (shader par defaut ici)
+        // dessin du vaisseau
         gl.useProgram(spaceship.shader());
         spaceship.sendUniformVariables();
         spaceship.draw();
 
-        // dessin d'un enemie
+        // dessin des missiles de l'ennemi
         for (var i = 0, length = ennemis.length ; i < length ; i++) {
-            // dessin des missiles de l'ennemi
             for (var i2 = 0, length2 = ennemis[i].missiles.length ; i2 < length2 ; i2++) {
                 gl.useProgram(ennemis[i].missiles[i2].shader());
                 ennemis[i].missiles[i2].sendUniformVariables();
                 ennemis[i].missiles[i2].draw();
             }
+        }
 
+        // dessin d'un enemie
+        for (var i = 0, length = ennemis.length ; i < length ; i++) {
             gl.useProgram(ennemis[i].shader());
             ennemis[i].sendUniformVariables();
             ennemis[i].draw();
