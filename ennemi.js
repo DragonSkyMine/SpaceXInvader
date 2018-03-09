@@ -63,11 +63,13 @@ function Ennemi(fireType, missileSpeed, reloadTime) {
 	var wo2 = 0.5*this.width;
 	var ho2 = 0.5*this.height;
 
+    let zTranform = Math.random()/10;
+
 	var vertices = [
-		-wo2,-ho2, -0.6,
-		 wo2,-ho2, -0.6,
-		 wo2, ho2, -0.6,
-		-wo2, ho2, -0.6
+		-wo2,-ho2, -0.6 - zTranform,
+		 wo2,-ho2, -0.6 - zTranform,
+		 wo2, ho2, -0.6 - zTranform,
+		-wo2, ho2, -0.6 - zTranform
 	];
 
 	// on envoie ces positions au GPU ici (et on se rappelle de leur nombre/taille)
@@ -100,8 +102,8 @@ function Ennemi(fireType, missileSpeed, reloadTime) {
 }
 
 Ennemi.prototype.initParameters = function(fireType, missileSpeed, reloadTime) {
-	this.width = 0.25;
-	this.height = 0.25;
+	this.width = 0.175;
+	this.height = 0.175;
 	this.position = [0.0,-0.7];
 	this.timer = 0.0;
 

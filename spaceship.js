@@ -104,8 +104,8 @@ function Spaceship() {
 }
 
 Spaceship.prototype.initParameters = function() {
-	this.width = 0.160;
-	this.height = 0.50;
+	this.width = 0.096;
+	this.height = 0.3;
 	this.position = [0.0,-0.7];
 	this.timer = 0.0;
 	this.time = 0.0;
