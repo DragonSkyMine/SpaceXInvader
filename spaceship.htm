@@ -558,10 +558,10 @@ void main(void) {
     }
 
     function rectCollide(rect1, rect2) {
-      if (rect1.position[0] < rect2.position[0] + rect2.width &&
-          rect1.position[0] + rect1.width > rect2.position[0] &&
-          rect1.position[1] < rect2.position[1] + rect2.height &&
-          rect1.height + rect1.position[1] > rect2.position[1]) {
+      if (rect1.position[0] - rect1.width/2 < rect2.position[0] + rect2.width/2 &&
+          rect1.position[0] + rect1.width/2 > rect2.position[0] - rect2.width/2 &&
+          rect1.position[1] - rect1.height/2 < rect2.position[1] + rect2.height/2 &&
+          rect1.height/2 + rect1.position[1] > rect2.position[1] - rect2.height/2) {
           return true;
       }
       return false;
