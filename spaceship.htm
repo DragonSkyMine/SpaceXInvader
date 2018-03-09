@@ -488,7 +488,18 @@ void main(void) {
 
         if(time == spawntime){
             time = 0;
-            en = new Ennemi(1, 0.8, 1000);
+
+            // Génération aléatoir du type d'ennemi
+            let en = null;
+            let type = Math.round((Math.random() * 2) + 1);
+            if (type === 1){
+                en = new Ennemi(1, 0.6, 1500);
+            }else if (type === 2){
+                en = new Ennemi(2, 1, 1000);
+            }else{
+                en = new Ennemi(3, 0.8, 1000);
+            }
+
             var x = Math.random() * (+1 - -1) + -1;
             var y =  Math.random() * (+1 - 0.5) + 1.25;
             en.initX = x;
