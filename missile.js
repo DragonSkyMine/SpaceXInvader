@@ -126,8 +126,8 @@ function Missile(x, y, speedX, speedY, fromSpaceShip = true) {
 }
 
 Missile.prototype.initParameters = function(x, y, speedX, speedY, fromSpaceShip) {
-	this.width = 0.05;
-	this.height = 0.1;
+	this.width = 0.033;
+	this.height = 0.066;
 	this.position = [x, y];
 	this.speed = [speedX, speedY];
 	this.fromSpaceShip = fromSpaceShip;

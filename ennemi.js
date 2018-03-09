@@ -100,8 +100,8 @@ function Ennemi(fireType, missileSpeed, reloadTime) {
 }
 
 Ennemi.prototype.initParameters = function(fireType, missileSpeed, reloadTime) {
-	this.width = 0.25;
-	this.height = 0.25;
+	this.width = 0.175;
+	this.height = 0.175;
 	this.position = [0.0,-0.7];
 	this.timer = 0.0;
 
