@@ -89,11 +89,13 @@ function Missile(x, y, speedX, speedY, fromSpaceShip = true) {
 	var wo2 = 0.5*this.width;
 	var ho2 = 0.5*this.height;
 
+	let zTranform = Math.random()/10;
+
 	var vertices = [
-		-wo2,-ho2, -0.5,
-		 wo2,-ho2, -0.5,
-		 wo2, ho2, -0.5,
-		-wo2, ho2, -0.5
+		-wo2,-ho2, -0.5 - zTranform,
+		 wo2,-ho2, -0.5 - zTranform,
+		 wo2, ho2, -0.5 - zTranform,
+		-wo2, ho2, -0.5 - zTranform
 	];
 
 	// on envoie ces positions au GPU ici (et on se rappelle de leur nombre/taille)
