@@ -545,6 +545,7 @@ void main(void) {
             if (rectCollide(missile, ennemi)) {
               killEnnemi(ennemi);
               killed++;
+              this.spaceship.score += 500;
               this.spaceship.removeMissile(i2);
               i--;
               i2--;
@@ -582,11 +583,17 @@ void main(void) {
     }
 
     function updateInterface() {
-      $('#killed').html(killed);
+      $('#killed').html(this.killed);
       $('#hp').html(this.spaceship.hp);
+      $('#score').html(this.spaceship.score);
+    }
+
+    function score() {
+      this.score++;
     }
 
     function tick() {
+      this.spaceship.score += 1;
       requestAnimFrame(tick);
       handleKeys();
       outOfMap();
@@ -679,6 +686,11 @@ void main(void) {
       <div class="kill">
         <p>Ennemi Killed</p>
         <p id="killed"></p>
+      </div>
+      <hr style="width: 70%; margin: auto;">
+      <div class="score">
+        <p>Score</p>
+        <p id="score"></p>
       </div>
       <hr style="">
     </div>
