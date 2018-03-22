@@ -163,6 +163,9 @@ Spaceship.prototype.fireMissile = function(elapsed) {
 Spaceship.prototype.takeDamage = function(damages) {
 	if (this.invincibleTime <= 0) {
 		this.hp -= damages;
+		if (this.hp < 0) {
+			this.hp = 0;
+		}
 		this.invincibleTime = 50;
 		console.log("took " + damages + " damages");
 		console.log(this.hp + " hp left");
