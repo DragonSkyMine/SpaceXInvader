@@ -196,3 +196,8 @@ Ennemi.prototype.draw = function() {
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.triangles);
 	gl.drawElements(gl.TRIANGLES, this.triangles.numItems, gl.UNSIGNED_SHORT, 0);
 }
+
+Ennemi.prototype.destruction = function() {
+	console.log("Ennemi killed");
+	ennemiTexture.image.src = "img/ennemi2.png";
+}
