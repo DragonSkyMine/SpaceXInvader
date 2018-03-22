@@ -166,6 +166,8 @@ Spaceship.prototype.takeDamage = function(damages) {
 		this.invincibleTime = 50;
 		console.log("took " + damages + " damages");
 		console.log(this.hp + " hp left");
+		dam = new Audio('damage.mp3');
+		dam.play();
 	}
 }
 
