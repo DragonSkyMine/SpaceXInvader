@@ -109,6 +109,7 @@ Spaceship.prototype.initParameters = function() {
 	this.position = [0.0,-0.7];
 	this.timer = 0.0;
 	this.time = 0.0;
+	this.score = 0.0;
 
 	// temps de rechagement (ms)
 	this.reloadTime = 200;
@@ -145,7 +146,16 @@ Spaceship.prototype.fireMissile = function(elapsed) {
     // test des tirs
     this.timeBeforeNextFire -= elapsed;
     if (this.fire && this.timeBeforeNextFire <= 0) {
-        this.missiles.push(new Missile(this.position[0], this.position[1] + this.height/2, 0, this.missileSpeed, true));
+			if (this.score > 50000) {
+				this.missiles.push(new Missile(this.position[0], this.position[1] + this.height/2, 0, this.missileSpeed, true));
+				this.missiles.push(new Missile(this.position[0], this.position[1] + this.height/2, -this.missileSpeed*0.2, this.missileSpeed*0.9, true));
+				this.missiles.push(new Missile(this.position[0], this.position[1] + this.height/2, this.missileSpeed*0.2, this.missileSpeed*0.9, true));
+			} else if (this.score > 20000) {
+				this.missiles.push(new Missile(this.position[0] + (this.width * 0.25), this.position[1] + this.height/2, 0, this.missileSpeed, true));
+				this.missiles.push(new Missile(this.position[0] - (this.width * 0.25), this.position[1] + this.height/2, 0, this.missileSpeed, true));
+			} else {
+				this.missiles.push(new Missile(this.position[0], this.position[1] + this.height/2, 0, this.missileSpeed, true));
+			}
         this.timeBeforeNextFire = this.reloadTime;
     }
 }
