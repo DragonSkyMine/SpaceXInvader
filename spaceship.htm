@@ -600,6 +600,14 @@ void main(void) {
 
 
     function webGLStart() {
+        // initialisation de la musique
+        myAudio = new Audio('Bowie-starman.mp3');
+        myAudio.addEventListener('ended', function() {
+            this.currentTime = 0;
+            this.play();
+        }, false);
+        myAudio.play();
+
         // initialisation du canvas et des objets OpenGL
         var canvas = document.getElementById("SpaceShip");
         initGL(canvas);
