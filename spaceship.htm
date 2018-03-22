@@ -579,7 +579,12 @@ void main(void) {
 
     function killEnnemi(ennemi) {
       Array.prototype.push.apply(lostMissiles, ennemi.missiles);
+
+      // todo avant de la tuer faire un sprit de destruction
+      ennemi.destruction();
+
       this.ennemis.splice(this.ennemis.indexOf(ennemi), 1);
+
     }
 
     function updateInterface() {
@@ -609,6 +614,7 @@ void main(void) {
     function webGLStart() {
         // initialisation de la musique
         myAudio = new Audio('Bowie-starman.mp3');
+        // musique jouée en boucle
         myAudio.addEventListener('ended', function() {
             this.currentTime = 0;
             this.play();
@@ -640,7 +646,6 @@ void main(void) {
         background = new Background(fbo.texture(0));
         spaceship = new Spaceship();
         weather = new Weather();
-        // this.ennemis.push(new ennemi());
 
         // la couleur de fond sera noire
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
