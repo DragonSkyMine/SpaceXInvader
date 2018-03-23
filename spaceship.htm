@@ -599,15 +599,18 @@ void main(void) {
     }
 
     function pauseFunction() {
-        if (pause) {
-            pause = false;
-            lastTime = new Date().getTime();
-            tick();
-            document.getElementById("pause").style.display = 'none';
-        } else {
-            pause = true;
-            document.getElementById("pause").style.display = 'block';
+        if (!gameOver) {
+            if (pause) {
+                pause = false;
+                lastTime = new Date().getTime();
+                tick();
+                document.getElementById("pause").style.display = 'none';
+            } else {
+                pause = true;
+                document.getElementById("pause").style.display = 'block';
+            }
         }
+
     }
 
     function gameOverFunction() {
@@ -736,7 +739,7 @@ void main(void) {
 
     <div id="gameover" style="margin: 8px; position: absolute; width: 800px; height: 800px; left: 0px; top: 0px; display: none;">
         <p style="font-size: 50px;  margin-top: 40%">Game Over</p>
-        <p style="font-size: 30px;" onclick="/*fonction rejouer*/">Rejouer</p>
+        <p style="font-size: 30px;" onclick="/*fonction rejouer*/window.location.reload()">Rejouer</p>
     </div>
 </body>
 </html>
