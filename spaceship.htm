@@ -15,6 +15,7 @@
   <script type="text/javascript" src="missile.js"></script>
   <script type="text/javascript" src="ennemi.js"></script>
   <script type="text/javascript" src="weather.js"></script>
+  <script type="text/javascript" src="bonus.js"></script>
 
   <script id="heightfield-vs" type="x-shader/x-vertex">
   // *** le vertex shader ***
@@ -276,6 +277,50 @@ void main(void) {
 }
 </script>
 
+<script id="bonus-vs" type="x-shader/x-vertex">
+// *** le vertex shader ***
+attribute vec3 aVertexPosition; // la position du sommet
+attribute vec2 aVertexCoord; // sa coordonnee de texture
+
+uniform vec2 uPosition; // position du vaisseau
+varying vec2 vTextureCoord; // on souhaite rasteriser la coordonnee
+
+void main(void) {
+  // projection de la position
+  gl_Position = vec4(aVertexPosition+vec3(uPosition,0.0), 1.0);
+
+  // stockage de la coordonnee de texture
+  vTextureCoord = aVertexCoord;
+}
+</script>
+
+<script id="bonus-fs" type="x-shader/x-fragment">
+// *** le fragment shader ***
+precision highp float; // precision des nombres flottant
+
+varying vec2 vTextureCoord; // recuperation de la coord rasterisee
+
+uniform sampler2D uTexture; // la texture en entree
+uniform int uType; // type du bonus
+
+void main(void) {
+    vec4 color;
+    if (uType == 0) {
+      color = vec4(0.0, 0.1, 1.0, 0.0);
+    } else if (uType == 1) {
+      color = vec4(0.1, 1.0, 0.1, 0.0);
+    } else if (uType == 2) {
+      color = vec4(1.0, 0.1, 0.1, 0.0);
+    } else if (uType == 3) {
+      color = vec4(1.0, 0.9, 0.4, 0.0);
+    }
+    gl_FragColor = texture2D(uTexture, vTextureCoord) + color;
+}
+
+
+
+</script>
+
 <script type="text/javascript">
 
     var fbo; // le FBO utilis� pour rendre la texture de hauteur
@@ -288,6 +333,7 @@ void main(void) {
     var lostMissiles = []; // Les missiles dont le propriétaires n'existe plus (pour continuer de les afficher)
     var pause = false; // jeu en pause
     var gameOver = false; // le joueur est mort
+    var bonus = []; // les bonus
 
     function drawScene() {
         // initialisation du viewport
@@ -346,6 +392,13 @@ void main(void) {
             gl.useProgram(lostMissiles[i].shader());
             lostMissiles[i].sendUniformVariables();
             lostMissiles[i].draw();
+        }
+
+        // dessin des bonus
+        for (var i = 0, length = bonus.length ; i < length ; i++) {
+            gl.useProgram(bonus[i].shader());
+            bonus[i].sendUniformVariables();
+            bonus[i].draw();
         }
 
         gl.useProgram(weather.shader());
@@ -422,6 +475,11 @@ void main(void) {
             // annimation des missiles perdus
             for (var i = 0, length = lostMissiles.length ; i < length ; i++) {
                 lostMissiles[i].setParameters(elapsed);
+            }
+
+            // annimation des bonus
+            for (var i = 0, length = bonus.length ; i < length ; i++) {
+                bonus[i].setParameters(elapsed);
             }
         }
         lastTime = timeNow;
@@ -542,6 +600,9 @@ void main(void) {
             if (rectCollide(missile, ennemi)) {
               killEnnemi(ennemi);
               killed++;
+              if (getRandomInt(6) == 0) {
+                this.bonus.push(new Bonus(ennemi.position[0], ennemi.position[1], getRandomInt(4)))
+              }
               this.spaceship.score += 500;
               this.spaceship.removeMissile(i2);
               i--;
@@ -558,6 +619,15 @@ void main(void) {
         if (rectCollide(missile, this.spaceship)) {
           this.spaceship.takeDamage(30);
           lostMissiles.splice(i, 1);
+          i--;
+        }
+      }
+
+      // collision des bonus perdus
+      for (var i = 0; i < bonus.length ; i++) {
+        if (rectCollide(bonus[i], this.spaceship)) {
+          this.spaceship.bonus(bonus[i]);
+          bonus.splice(i, 1);
           i--;
         }
       }
@@ -596,6 +666,10 @@ void main(void) {
 
     function score() {
       this.score++;
+    }
+
+    function getRandomInt(max) {
+      return Math.floor(Math.random() * Math.floor(max));
     }
 
     function pauseFunction() {
@@ -659,11 +733,13 @@ void main(void) {
         initMissileShader();
         initweatherShader();
         initEnnemiShader(); //ph
+        initBonusShader();
 
         // init des textures
         initSpaceshipTexture();
         initMissileTexture();
         initEnnemiTexture(); //ph
+        initBonusTexture();
 
         // init de tous les objets
         heightfield = new Heightfield();

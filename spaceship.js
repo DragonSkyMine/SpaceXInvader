@@ -112,7 +112,7 @@ Spaceship.prototype.initParameters = function() {
 	this.score = 0.0;
 
 	// temps de rechagement (ms)
-	this.reloadTime = 200;
+	this.reloadTime = 400;
 
 	// vitesse du missile en y
 	this.missileSpeed = 1;
@@ -172,6 +172,19 @@ Spaceship.prototype.takeDamage = function(damages) {
 		dam = new Audio('damage.mp3');
 		dam.play();
 	}
+}
+
+Spaceship.prototype.bonus = function(bonus) {
+	if (bonus.type === 0) {
+		this.missileSpeed = Math.min(2.5, this.missileSpeed + 0.2);
+	} else if (bonus.type === 1) {
+		this.reloadTime = Math.max(100, this.reloadTime - 40);
+	} else if (bonus.type === 2) {
+		this.hp += 20;
+	} else if (bonus.type === 3) {
+		this.invincibleTime = 200;
+	}
+	this.score += 300;
 }
 
 Spaceship.prototype.setPosition = function(x,y) {
