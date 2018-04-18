@@ -51,10 +51,10 @@ float hash(vec2 p) {
 }
 
 float vnoise(in vec2 p) {
-    // genere une valeur random sur une position sp�cifique d'une grille
-    // pris sur shadertoy
-    vec2 i = floor(p);
-    vec2 f = fract(p);
+  // genere une valeur random sur une position sp�cifique d'une grille
+  // pris sur shadertoy
+  vec2 i = floor(p);
+  vec2 f = fract(p);
 
   vec2 u = f*f*(3.0-2.0*f);
 
@@ -114,26 +114,26 @@ uniform vec2 uTextureSize; // la taille de la texture
 varying vec2 vTextureCoord; // recuperation de la coord rasterisee
 
 vec3 shade(in vec3 n,in float d) {
-    vec2 xy = vTextureCoord.xy*2.0-vec2(1.0);
-    vec3 v = -normalize(vec3(xy.x,xy.y,1.0)); // vecteur vue
-    vec3 l = normalize(vec3(-3.0, 0.5, 10.0)); // vecteur lumière (pourrait varier au cours du temps pour de meilleurs effets)
+  vec2 xy = vTextureCoord.xy*2.0-vec2(1.0);
+  vec3 v = -normalize(vec3(xy.x,xy.y,1.0)); // vecteur vue
+  vec3 l = normalize(vec3(-3.0, 0.5, 10.0)); // vecteur lumière (pourrait varier au cours du temps pour de meilleurs effets)
 
-    // TODO : le shading !
-    // la fonction prend en entrée la normale du terrain et sa profondeur
-    float contrast =  max(0.0, 0.25 - (uTime * 0.25));
-    vec3 r = reflect(l, n);
-    vec3 couleur = vec3(0.1, 0.08, 0.05);
-    vec3 diffuse = vec3(0.7, 0.3, 0.1) + (d * contrast);
-    vec3 gloss = vec3(0.1, 0.0, 0.0);
+  // TODO : le shading !
+  // la fonction prend en entrée la normale du terrain et sa profondeur
+  float contrast =  max(0.0, 0.25 - (uTime * 0.25));
+  vec3 r = reflect(l, n);
+  vec3 couleur = vec3(0.1, 0.08, 0.05);
+  vec3 diffuse = vec3(0.7, 0.3, 0.1) + (d * contrast);
+  vec3 gloss = vec3(0.1, 0.0, 0.0);
 
-    vec3 kdnl = diffuse * max(dot(n, l), 0.0);
-    vec3 ksvr = gloss * pow(max(dot(v, r), 0.0), 1.0);
+  vec3 kdnl = diffuse * max(dot(n, l), 0.0);
+  vec3 ksvr = gloss * pow(max(dot(v, r), 0.0), 1.0);
 
 
-    // la couleur est attribuee au fragment courant
-    n = (couleur + kdnl + ksvr) - uTime;
+  // la couleur est attribuee au fragment courant
+  n = (couleur + kdnl + ksvr) - uTime;
 
-    return n;
+  return n;
 }
 
 vec3 computeNormal() {
@@ -155,10 +155,10 @@ vec3 computeNormal() {
 }
 
 void main(void) {
-    float d = texture2D(uHeightfield,vTextureCoord).x;
-    vec3 n = computeNormal();
-    vec3 s = shade(n,d);
-    gl_FragColor = vec4(s,1.0);
+  float d = texture2D(uHeightfield,vTextureCoord).x;
+  vec3 n = computeNormal();
+  vec3 s = shade(n,d);
+  gl_FragColor = vec4(s,1.0);
 }
 </script>
 
@@ -189,9 +189,9 @@ uniform float uInvincible; // effet invincible
 uniform sampler2D uTexture; // la texture en entree
 
 void main(void) {
-    gl_FragColor = texture2D(uTexture, vTextureCoord);
-    vec3 color = vec3(gl_FragColor.x - (0.2 * uTime) + uInvincible, gl_FragColor.y - uTime, gl_FragColor.z - uTime);
-    gl_FragColor = vec4(color, gl_FragColor.w);
+  gl_FragColor = texture2D(uTexture, vTextureCoord);
+  vec3 color = vec3(gl_FragColor.x - (0.2 * uTime) + uInvincible, gl_FragColor.y - uTime, gl_FragColor.z - uTime);
+  gl_FragColor = vec4(color, gl_FragColor.w);
 }
 </script>
 
@@ -220,7 +220,7 @@ varying vec2 vTextureCoord; // recuperation de la coord rasterisee
 uniform sampler2D uTexture; // la texture en entree
 
 void main(void) {
-    gl_FragColor = texture2D(uTexture, vTextureCoord);
+  gl_FragColor = texture2D(uTexture, vTextureCoord);
 }
 </script>
 
@@ -250,7 +250,7 @@ varying vec2 vTextureCoord; // recuperation de la coord rasterisee
 uniform sampler2D uTexture; // la texture en entree
 
 void main(void) {
-    gl_FragColor = texture2D(uTexture, vTextureCoord);
+  gl_FragColor = texture2D(uTexture, vTextureCoord);
 }
 </script>
 
@@ -273,7 +273,7 @@ precision highp float; // precision des nombres flottant
 uniform float uTime; // temps actuel
 
 void main(void) {
-    gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
+  gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
 }
 </script>
 
@@ -304,17 +304,17 @@ uniform sampler2D uTexture; // la texture en entree
 uniform int uType; // type du bonus
 
 void main(void) {
-    vec4 color;
-    if (uType == 0) {
-      color = vec4(0.0, 0.1, 1.0, 0.0);
-    } else if (uType == 1) {
-      color = vec4(0.1, 1.0, 0.1, 0.0);
-    } else if (uType == 2) {
-      color = vec4(1.0, 0.1, 0.1, 0.0);
-    } else if (uType == 3) {
-      color = vec4(1.0, 0.9, 0.4, 0.0);
-    }
-    gl_FragColor = texture2D(uTexture, vTextureCoord) + color;
+  vec4 color;
+  if (uType == 0) {
+    color = vec4(0.0, 0.1, 1.0, 0.0);
+  } else if (uType == 1) {
+    color = vec4(0.1, 1.0, 0.1, 0.0);
+  } else if (uType == 2) {
+    color = vec4(1.0, 0.1, 0.1, 0.0);
+  } else if (uType == 3) {
+    color = vec4(1.0, 0.9, 0.4, 0.0);
+  }
+  gl_FragColor = texture2D(uTexture, vTextureCoord) + color;
 }
 
 
@@ -323,223 +323,223 @@ void main(void) {
 
 <script type="text/javascript">
 
-    var fbo; // le FBO utilis� pour rendre la texture de hauteur
-    var heightfield; // l'objet heightfield, sa g�om�trie, son shader
-    var background; // l'objet background, sa g�om�trie, son shader
-    var spaceship; // l'objet spaceship, sa g�om�trie, son shader
-    var weather;  // l'objet weather, sa g�om�trie, son shader
-    var ennemis = []; // Les ennemis
-    var killed = 0; // Les ennemis tués par le joueur
-    var lostMissiles = []; // Les missiles dont le propriétaires n'existe plus (pour continuer de les afficher)
-    var pause = false; // jeu en pause
-    var gameOver = false; // le joueur est mort
-    var bonus = []; // les bonus
+var fbo; // le FBO utilis� pour rendre la texture de hauteur
+var heightfield; // l'objet heightfield, sa g�om�trie, son shader
+var background; // l'objet background, sa g�om�trie, son shader
+var spaceship; // l'objet spaceship, sa g�om�trie, son shader
+var weather;  // l'objet weather, sa g�om�trie, son shader
+var ennemis = []; // Les ennemis
+var killed = 0; // Les ennemis tués par le joueur
+var lostMissiles = []; // Les missiles dont le propriétaires n'existe plus (pour continuer de les afficher)
+var pause = false; // jeu en pause
+var gameOver = false; // le joueur est mort
+var bonus = []; // les bonus
 
-    function drawScene() {
-        // initialisation du viewport
-        gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-        gl.enable(gl.BLEND);
-        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-        // efface les buffers de couleur et de profondeur
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+function drawScene() {
+  // initialisation du viewport
+  gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  // efface les buffers de couleur et de profondeur
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        // active le FBO (a partie de la, on dessine dans la texture associ�e)
-        gl.bindFramebuffer(gl.FRAMEBUFFER,fbo.id());
+  // active le FBO (a partie de la, on dessine dans la texture associ�e)
+  gl.bindFramebuffer(gl.FRAMEBUFFER,fbo.id());
 
-        // dessin du heightfield
-        gl.useProgram(heightfield.shader());
-        heightfield.sendUniformVariables();
-        heightfield.draw();
+  // dessin du heightfield
+  gl.useProgram(heightfield.shader());
+  heightfield.sendUniformVariables();
+  heightfield.draw();
 
-        // desactivation du FBO (on dessine sur l'ecran maintenant)
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  // desactivation du FBO (on dessine sur l'ecran maintenant)
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-        // dessin du background (utilise la texture dessin�e pr�c�demment)
-        gl.useProgram(background.shader());
-        background.sendUniformVariables();
-        background.draw();
+  // dessin du background (utilise la texture dessin�e pr�c�demment)
+  gl.useProgram(background.shader());
+  background.sendUniformVariables();
+  background.draw();
 
-        // dessin des missiles du joueur
-        for (var i = 0, length = spaceship.missiles.length ; i < length ; i++) {
-            gl.useProgram(spaceship.missiles[i].shader());
-            spaceship.missiles[i].sendUniformVariables();
-            spaceship.missiles[i].draw();
-        }
+  // dessin des missiles du joueur
+  for (var i = 0, length = spaceship.missiles.length ; i < length ; i++) {
+    gl.useProgram(spaceship.missiles[i].shader());
+    spaceship.missiles[i].sendUniformVariables();
+    spaceship.missiles[i].draw();
+  }
 
-        // dessin du vaisseau
-        gl.useProgram(spaceship.shader());
-        spaceship.sendUniformVariables();
-        spaceship.draw();
+  // dessin du vaisseau
+  gl.useProgram(spaceship.shader());
+  spaceship.sendUniformVariables();
+  spaceship.draw();
 
-        // dessin des missiles de l'ennemi
-        for (var i = 0, length = ennemis.length ; i < length ; i++) {
-            for (var i2 = 0, length2 = ennemis[i].missiles.length ; i2 < length2 ; i2++) {
-                gl.useProgram(ennemis[i].missiles[i2].shader());
-                ennemis[i].missiles[i2].sendUniformVariables();
-                ennemis[i].missiles[i2].draw();
-            }
-        }
+  // dessin des missiles de l'ennemi
+  for (var i = 0, length = ennemis.length ; i < length ; i++) {
+    for (var i2 = 0, length2 = ennemis[i].missiles.length ; i2 < length2 ; i2++) {
+      gl.useProgram(ennemis[i].missiles[i2].shader());
+      ennemis[i].missiles[i2].sendUniformVariables();
+      ennemis[i].missiles[i2].draw();
+    }
+  }
 
-        // dessin d'un enemie
-        for (var i = 0, length = ennemis.length ; i < length ; i++) {
-            gl.useProgram(ennemis[i].shader());
-            ennemis[i].sendUniformVariables();
-            ennemis[i].draw();
-        }
+  // dessin d'un enemie
+  for (var i = 0, length = ennemis.length ; i < length ; i++) {
+    gl.useProgram(ennemis[i].shader());
+    ennemis[i].sendUniformVariables();
+    ennemis[i].draw();
+  }
 
-        // dessin des missiles perdus
-        for (var i = 0, length = lostMissiles.length ; i < length ; i++) {
-            gl.useProgram(lostMissiles[i].shader());
-            lostMissiles[i].sendUniformVariables();
-            lostMissiles[i].draw();
-        }
+  // dessin des missiles perdus
+  for (var i = 0, length = lostMissiles.length ; i < length ; i++) {
+    gl.useProgram(lostMissiles[i].shader());
+    lostMissiles[i].sendUniformVariables();
+    lostMissiles[i].draw();
+  }
 
-        // dessin des bonus
-        for (var i = 0, length = bonus.length ; i < length ; i++) {
-            gl.useProgram(bonus[i].shader());
-            bonus[i].sendUniformVariables();
-            bonus[i].draw();
-        }
+  // dessin des bonus
+  for (var i = 0, length = bonus.length ; i < length ; i++) {
+    gl.useProgram(bonus[i].shader());
+    bonus[i].sendUniformVariables();
+    bonus[i].draw();
+  }
 
-        gl.useProgram(weather.shader());
-        weather.sendUniformVariables();
-        weather.draw();
+  gl.useProgram(weather.shader());
+  weather.sendUniformVariables();
+  weather.draw();
+}
+
+// une bonne mani�re de gerer les evenements claviers
+// permet d'avoir plusieurs touches appuy�es simultan�men
+var currentlyPressedKeys = {};
+
+function handleKeyDown(event) {
+  currentlyPressedKeys[event.keyCode] = true;
+  if (event.keyCode === 80) {
+    pauseFunction();
+  }
+}
+
+
+function handleKeyUp(event) {
+  currentlyPressedKeys[event.keyCode] = false;
+}
+
+function handleKeys() {
+
+}
+
+function mouseMove(event) {
+  // controle de la position du vaisseau en fonction de la souris
+  // la position est remapp�e entre -1 et 1 pour cela
+  var newx = 2.0*(event.clientX/gl.viewportWidth)-1.0;
+  var newy = -(2.0*(event.clientY/gl.viewportHeight)-1.0);
+  spaceship.setPosition(newx, newy);
+}
+
+function tbMouseDown(event) {
+  spaceship.beginFire();
+}
+
+function tbMouseUp(event) {
+  spaceship.stopFire();
+}
+
+
+
+
+// animation
+var lastTime = 0;
+function animate() {
+  var timeNow = new Date().getTime();
+  if (lastTime != 0) {
+    // chaque objet est susceptible de s'animer
+    var elapsed = timeNow - lastTime;
+    heightfield.setParameters(elapsed);
+    spaceship.setParameters(elapsed);
+    background.setParameters(elapsed);
+    weather.setParameters(elapsed);
+
+    // annimation des missiles du joueur
+    for (var i = 0, length = spaceship.missiles.length ; i < length ; i++) {
+      spaceship.missiles[i].setParameters(elapsed);
+    };
+
+    // annimation des ennemis et de leurs missiles
+    for (var i = 0, length = ennemis.length ; i < length ; i++) {
+      ennemis[i].setParameters(elapsed);
+
+      // annimation des missiles des ennemis
+      for (var i2 = 0, length2 = ennemis[i].missiles.length ; i2 < length2 ; i2++) {
+        ennemis[i].missiles[i2].setParameters(elapsed);
+      }
     }
 
-    // une bonne mani�re de gerer les evenements claviers
-    // permet d'avoir plusieurs touches appuy�es simultan�men
-    var currentlyPressedKeys = {};
+    // annimation des missiles perdus
+    for (var i = 0, length = lostMissiles.length ; i < length ; i++) {
+      lostMissiles[i].setParameters(elapsed);
+    }
 
-    function handleKeyDown(event) {
-        currentlyPressedKeys[event.keyCode] = true;
-        if (event.keyCode === 80) {
-            pauseFunction();
+    // annimation des bonus
+    for (var i = 0, length = bonus.length ; i < length ; i++) {
+      bonus[i].setParameters(elapsed);
+    }
+  }
+  lastTime = timeNow;
+}
+
+// Supprime les éléments hors écran
+function outOfMap() {
+  // Pour les missiles du joueur
+  for (var i = 0 ; i < spaceship.missiles.length ; i++) {
+    if (spaceship.missiles[i].position[1] > 1 + spaceship.missiles[i].height/2){
+      spaceship.removeMissile(i);
+      i--;
+    }
+  }
+
+  // Pour les ennemis et leurs missiles
+  for (var i = 0 ; i < ennemis.length ; i++) {
+    for (var i2 = 0 ; i2 < ennemis[i].missiles.length ; i2++) {
+      let position = ennemis[i].missiles[i2].position;
+      let height = ennemis[i].missiles[i2].height;
+      let width = ennemis[i].missiles[i2].width;
+      if (position[0] > 1 + width/2 || position[0] < -1 - width/2
+        || position[1] > 1 + height/2 || position[1] < -1 - height/2){
+          ennemis[i].removeMissile(i2);
+          i2--;
         }
+      }
+
+      if (ennemis[i].position[1] < -1 - ennemis[i].height/2){
+        Array.prototype.push.apply(lostMissiles, ennemis[i].missiles);
+        ennemis.splice(i, 1);
+        i--;
+      }
     }
 
-
-    function handleKeyUp(event) {
-        currentlyPressedKeys[event.keyCode] = false;
-    }
-
-    function handleKeys() {
-
-    }
-
-    function mouseMove(event) {
-        // controle de la position du vaisseau en fonction de la souris
-        // la position est remapp�e entre -1 et 1 pour cela
-        var newx = 2.0*(event.clientX/gl.viewportWidth)-1.0;
-        var newy = -(2.0*(event.clientY/gl.viewportHeight)-1.0);
-        spaceship.setPosition(newx, newy);
-    }
-
-    function tbMouseDown(event) {
-        spaceship.beginFire();
-    }
-
-    function tbMouseUp(event) {
-        spaceship.stopFire();
-    }
-
-
-
-
-    // animation
-    var lastTime = 0;
-    function animate() {
-        var timeNow = new Date().getTime();
-        if (lastTime != 0) {
-            // chaque objet est susceptible de s'animer
-            var elapsed = timeNow - lastTime;
-            heightfield.setParameters(elapsed);
-            spaceship.setParameters(elapsed);
-            background.setParameters(elapsed);
-            weather.setParameters(elapsed);
-
-            // annimation des missiles du joueur
-            for (var i = 0, length = spaceship.missiles.length ; i < length ; i++) {
-                spaceship.missiles[i].setParameters(elapsed);
-            };
-
-            // annimation des ennemis et de leurs missiles
-            for (var i = 0, length = ennemis.length ; i < length ; i++) {
-                ennemis[i].setParameters(elapsed);
-
-                // annimation des missiles des ennemis
-                for (var i2 = 0, length2 = ennemis[i].missiles.length ; i2 < length2 ; i2++) {
-                    ennemis[i].missiles[i2].setParameters(elapsed);
-                }
-            }
-
-            // annimation des missiles perdus
-            for (var i = 0, length = lostMissiles.length ; i < length ; i++) {
-                lostMissiles[i].setParameters(elapsed);
-            }
-
-            // annimation des bonus
-            for (var i = 0, length = bonus.length ; i < length ; i++) {
-                bonus[i].setParameters(elapsed);
-            }
+    // Pour les missiles perdus
+    for (var i = 0 ; i < lostMissiles.length ; i++) {
+      let position = lostMissiles[i].position;
+      let height = lostMissiles[i].height;
+      let width = lostMissiles[i].width;
+      if (position[0] > 1 + width/2 || position[0] < -1 - width/2
+        || position[1] > 1 + height/2 || position[1] < -1 - height/2){
+          lostMissiles.splice(i, 1);
+          i--;
         }
-        lastTime = timeNow;
-    }
-
-    // Supprime les éléments hors écran
-    function outOfMap() {
-        // Pour les missiles du joueur
-        for (var i = 0 ; i < spaceship.missiles.length ; i++) {
-            if (spaceship.missiles[i].position[1] > 1 + spaceship.missiles[i].height/2){
-                spaceship.removeMissile(i);
-                i--;
-            }
-        }
-
-        // Pour les ennemis et leurs missiles
-        for (var i = 0 ; i < ennemis.length ; i++) {
-            for (var i2 = 0 ; i2 < ennemis[i].missiles.length ; i2++) {
-                let position = ennemis[i].missiles[i2].position;
-                let height = ennemis[i].missiles[i2].height;
-                let width = ennemis[i].missiles[i2].width;
-                if (position[0] > 1 + width/2 || position[0] < -1 - width/2
-                    || position[1] > 1 + height/2 || position[1] < -1 - height/2){
-                    ennemis[i].removeMissile(i2);
-                    i2--;
-                }
-            }
-
-            if (ennemis[i].position[1] < -1 - ennemis[i].height/2){
-                Array.prototype.push.apply(lostMissiles, ennemis[i].missiles);
-                ennemis.splice(i, 1);
-                i--;
-            }
-        }
-
-        // Pour les missiles perdus
-        for (var i = 0 ; i < lostMissiles.length ; i++) {
-            let position = lostMissiles[i].position;
-            let height = lostMissiles[i].height;
-            let width = lostMissiles[i].width;
-            if (position[0] > 1 + width/2 || position[0] < -1 - width/2
-                || position[1] > 1 + height/2 || position[1] < -1 - height/2){
-                lostMissiles.splice(i, 1);
-                i--;
-            }
-        }
+      }
     }
 
     // Tire les missiles
     function fireMissile() {
-        var timeNow = new Date().getTime();
-        if (lastTime != 0) {
-            var elapsed = timeNow - lastTime;
+      var timeNow = new Date().getTime();
+      if (lastTime != 0) {
+        var elapsed = timeNow - lastTime;
 
-            spaceship.fireMissile(elapsed);
+        spaceship.fireMissile(elapsed);
 
-            for (var i = 0, length = ennemis.length ; i < length ; i++) {
-                ennemis[i].fireMissile(elapsed, spaceship.position);
-            }
+        for (var i = 0, length = ennemis.length ; i < length ; i++) {
+          ennemis[i].fireMissile(elapsed, spaceship.position);
         }
+      }
     }
 
     var time = 0;
@@ -548,31 +548,31 @@ void main(void) {
     // Fonction qui va generer des ennemis aléatoire
     function generateEnnemi(){
 
-        time = time+1;
+      time = time+1;
 
-        if(time == spawntime){
-            time = 0;
+      if(time == spawntime){
+        time = 0;
 
-            // Génération aléatoir du type d'ennemi
-            let en = null;
-            let type = Math.round((Math.random() * 2) + 1);
-            if (type === 1){
-                en = new Ennemi(1, 0.6, 1500);
-            }else if (type === 2){
-                en = new Ennemi(2, 1, 1000);
-            }else{
-                en = new Ennemi(3, 0.8, 1000);
-            }
-
-            var x = Math.random() * (+1 - -1) + -1;
-            var y =  Math.random() * (+1 - 0.5) + 1.25;
-            en.initX = x;
-            en.setPosition(x,y);
-            this.ennemis.push(en);
-
-            spawntime -= Math.round(spawntime/50);
-            console.log(spawntime);
+        // Génération aléatoir du type d'ennemi
+        let en = null;
+        let type = Math.round((Math.random() * 2) + 1);
+        if (type === 1){
+          en = new Ennemi(1, 0.6, 1500);
+        }else if (type === 2){
+          en = new Ennemi(2, 1, 1000);
+        }else{
+          en = new Ennemi(3, 0.8, 1000);
         }
+
+        var x = Math.random() * (+1 - -1) + -1;
+        var y =  Math.random() * (+1 - 0.5) + 1.25;
+        en.initX = x;
+        en.setPosition(x,y);
+        this.ennemis.push(en);
+
+        spawntime -= Math.round(spawntime/50);
+        console.log(spawntime);
+      }
 
     }
 
@@ -632,90 +632,90 @@ void main(void) {
         }
       }
 
-        // test si le joueur est mort
-        if (spaceship.hp <= 0) {
-            gameOverFunction();
-        }
+      // test si le joueur est mort
+      if (spaceship.hp <= 0) {
+        gameOverFunction();
+      }
     }
 
     function rectCollide(rect1, rect2) {
       if (rect1.position[0] - rect1.width/2 < rect2.position[0] + rect2.width/2 &&
-          rect1.position[0] + rect1.width/2 > rect2.position[0] - rect2.width/2 &&
-          rect1.position[1] - rect1.height/2 < rect2.position[1] + rect2.height/2 &&
-          rect1.height/2 + rect1.position[1] > rect2.position[1] - rect2.height/2) {
+        rect1.position[0] + rect1.width/2 > rect2.position[0] - rect2.width/2 &&
+        rect1.position[1] - rect1.height/2 < rect2.position[1] + rect2.height/2 &&
+        rect1.height/2 + rect1.position[1] > rect2.position[1] - rect2.height/2) {
           return true;
+        }
+        return false;
       }
-      return false;
-    }
 
-    function killEnnemi(ennemi) {
-      Array.prototype.push.apply(lostMissiles, ennemi.missiles);
+      function killEnnemi(ennemi) {
+        Array.prototype.push.apply(lostMissiles, ennemi.missiles);
 
-      // todo avant de la tuer faire un sprit de destruction
-      ennemi.destruction();
+        // todo avant de la tuer faire un sprit de destruction
+        ennemi.destruction();
 
-      this.ennemis.splice(this.ennemis.indexOf(ennemi), 1);
+        this.ennemis.splice(this.ennemis.indexOf(ennemi), 1);
 
-    }
+      }
 
-    function updateInterface() {
-      $('#killed').html(this.killed);
-      $('#hp').html(this.spaceship.hp);
-      $('#score').html(this.spaceship.score);
-    }
+      function updateInterface() {
+        $('#killed').html(this.killed);
+        $('#hp').html(this.spaceship.hp);
+        $('#score').html(this.spaceship.score);
+      }
 
-    function score() {
-      this.score++;
-    }
+      function score() {
+        this.score++;
+      }
 
-    function getRandomInt(max) {
-      return Math.floor(Math.random() * Math.floor(max));
-    }
+      function getRandomInt(max) {
+        return Math.floor(Math.random() * Math.floor(max));
+      }
 
-    function pauseFunction() {
+      function pauseFunction() {
         if (!gameOver) {
-            if (pause) {
-                pause = false;
-                lastTime = new Date().getTime();
-                tick();
-                document.getElementById("pause").style.display = 'none';
-            } else {
-                pause = true;
-                document.getElementById("pause").style.display = 'block';
-            }
+          if (pause) {
+            pause = false;
+            lastTime = new Date().getTime();
+            tick();
+            document.getElementById("pause").style.display = 'none';
+          } else {
+            pause = true;
+            document.getElementById("pause").style.display = 'block';
+          }
         }
 
-    }
+      }
 
-    function gameOverFunction() {
+      function gameOverFunction() {
         gameOver = true;
         document.getElementById("gameover").style.display = 'block';
-    }
+      }
 
-    function tick() {
+      function tick() {
         handleKeys();
 
         if (!pause && !gameOver) {
-            this.spaceship.score += 1;
-            requestAnimFrame(tick);
-            outOfMap();
-            fireMissile();
-            generateEnnemi();
-            collide();
-            drawScene();
-            animate();
-            updateInterface();
+          this.spaceship.score += 1;
+          requestAnimFrame(tick);
+          outOfMap();
+          fireMissile();
+          generateEnnemi();
+          collide();
+          drawScene();
+          animate();
+          updateInterface();
         }
-    }
+      }
 
 
-    function webGLStart() {
+      function webGLStart() {
         // initialisation de la musique
         myAudio = new Audio('Bowie-starman.mp3');
         // musique jouée en boucle
         myAudio.addEventListener('ended', function() {
-            this.currentTime = 0;
-            this.play();
+          this.currentTime = 0;
+          this.play();
         }, false);
         myAudio.play();
 
@@ -763,59 +763,64 @@ void main(void) {
 
         // dessine la scene
         tick();
-    }
+      }
 
 
-</script>
+    </script>
 
 
-</head>
+  </head>
 
 
-<body onload="webGLStart();">
-  <canvas id="SpaceShip" style="border: none; cursor: none;" width="800" height="800"></canvas>
+  <body onload="webGLStart();">
+    <canvas id="SpaceShip" style="border: none; cursor: none;" width="800" height="800"></canvas>
 
-  <div class="menu">
+    <div class="menu">
 
-    <div class="logo">
-      <img src="img/logo.png" alt="logo" id="logo">
-      <hr style="margin-top: -5px;">
-    </div>
-
-    <div class="stat">
-      <div class="pv">
-        <p>Life Point</p>
-        <p id="hp"></p>
+      <div class="logo">
+        <img src="img/logo.png" alt="logo" id="logo">
+        <hr style="margin-top: -5px;">
       </div>
-      <hr style="width: 70%; margin: auto;">
-      <div class="kill">
-        <p>Ennemi Killed</p>
-        <p id="killed"></p>
+
+      <div class="stat">
+        <div class="pv">
+          <p>Life Point</p>
+          <p id="hp"></p>
+        </div>
+        <hr style="width: 70%; margin: auto;">
+        <div class="kill">
+          <p>Ennemi Killed</p>
+          <p id="killed"></p>
+        </div>
+        <hr style="width: 70%; margin: auto;">
+        <div class="score">
+          <p>Score</p>
+          <p id="score"></p>
+        </div>
+        <hr style="">
       </div>
-      <hr style="width: 70%; margin: auto;">
-      <div class="score">
-        <p>Score</p>
-        <p id="score"></p>
+      <div class="story" style="text-align:center;">
+        Bienvenue dans SpaceXinvader<br />
+        Survivez le plus longtemps en evitant les barilles de petrols avec vos voitures electriques !
       </div>
-      <hr style="">
+
       <div class="Musique">
+        <hr style="">
         <p>Musique</p>
         <p>David Bowie - Starman</p>
       </div>
+
+
+
     </div>
 
-    <div class="story">
+    <div id="pause" style="color: white; font-size: 50px; margin: 8px; position: absolute; width: 800px; height: 800px; left: 0px; top: 0px; display: none;">
+      <p style="margin-top: 40%">Pause</p>
     </div>
 
-  </div>
-
-    <div id="pause" style="font-size: 50px; margin: 8px; position: absolute; width: 800px; height: 800px; left: 0px; top: 0px; display: none;">
-        <p style="margin-top: 40%">Pause</p>
+    <div id="gameover" style=" color: white; margin: 8px; position: absolute; width: 800px; height: 800px; left: 0px; top: 0px; display: none;">
+      <p style="font-size: 50px;  margin-top: 40%">Game Over</p>
+      <p style="cursor: pointer; font-size: 30px;" onclick="/*fonction rejouer*/window.location.reload()">Rejouer</p>
     </div>
-
-    <div id="gameover" style="margin: 8px; position: absolute; width: 800px; height: 800px; left: 0px; top: 0px; display: none;">
-        <p style="font-size: 50px;  margin-top: 40%">Game Over</p>
-        <p style="font-size: 30px;" onclick="/*fonction rejouer*/window.location.reload()">Rejouer</p>
-    </div>
-</body>
-</html>
+  </body>
+  </html>

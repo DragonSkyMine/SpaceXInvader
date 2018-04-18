@@ -33,3 +33,12 @@ p {
   position: relative;
   left: 25px;
 }
+
+.Musique {
+  position: relative;
+  width: 350px;
+  height: 50px;
+  top: 270px;
+  left: 0;
+  right: 0;
+}
